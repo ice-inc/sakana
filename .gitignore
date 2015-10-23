@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
-=======
 # temp files from editors
 *~
 *.bak
@@ -35,4 +33,3 @@ desktop.ini
 /fuel/app/logs/*/*/*
 /fuel/app/cache/*/*
 /fuel/app/config/crypt.php
->>>>>>> 342f7079bdef0216516c68aeeb91b88e44f62a78
