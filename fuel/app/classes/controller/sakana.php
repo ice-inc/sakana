@@ -74,19 +74,7 @@ class Controller_Sakana extends Controller_Template
 			// トップページへ戻す
 			Response::redirect('sakana/index');
 		}
-		else
-		{
-			//Formの作成
-			$form = Fieldset::forge('commodity');
-			$form->repopulate($form);
-
-			$form->add('name', '商品名', array('type' => 'text', 'placeholder' => '\'));
-			$form->add('cost', '原価', array('type' => 'text'));
-			$form->add('price', '定価', array('type' => 'text'));
-
-			$output = View::forge('sakana/edit');
-			$output->set('form', $form); //formをViewに渡しており、Viewファイルでは$formをechoしています。
-		}
+		
 
 		// model/post.phpで定義された、validatieメソッド実行
 		// validationオブジェクトを$valに代入
