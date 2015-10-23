@@ -7,7 +7,7 @@ class Create_order_children
 	public function up()
 	{
 		\DBUtil::create_table('order_children', array(
-			'id' => array('constraint' => 11, 'type' => 'int'),
+			'id' => array('constraint' => 11, 'type' => 'int', 'auto_increment' => true),
 			'orders_id' => array('constraint' => 11, 'type' => 'int'),
 			'cost' => array('constraint' => 11, 'type' => 'int'),
 			'number' => array('constraint' => 11, 'type' => 'int'),

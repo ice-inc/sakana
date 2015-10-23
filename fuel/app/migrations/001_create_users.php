@@ -7,7 +7,7 @@ class Create_users
 	public function up()
 	{
 		\DBUtil::create_table('users', array(
-			'id' => array('constraint' => 11, 'type' => 'int'),
+			'id' => array('constraint' => 11, 'type' => 'int', 'auto_increment' => true),
 			'client_id' => array('constraint' => 11, 'type' => 'int'),
 			'number' => array('constraint' => 11, 'type' => 'int'),
 			'price' => array('constraint' => 11, 'type' => 'int'),

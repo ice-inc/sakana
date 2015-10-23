@@ -7,7 +7,7 @@ class Create_commodities
 	public function up()
 	{
 		\DBUtil::create_table('commodities', array(
-			'id' => array('constraint' => 11, 'type' => 'int'),
+			'id' => array('constraint' => 11, 'type' => 'int', 'auto_increment' => true),
 			'name' => array('constraint' => 255, 'type' => 'varchar'),
 			'cost' => array('constraint' => 11, 'type' => 'int'),
 			'price' => array('constraint' => 11, 'type' => 'int'),
