@@ -1,0 +1,28 @@
+<?php
+
+namespace Fuel\Migrations;
+
+class Create_users
+{
+	public function up()
+	{
+		\DBUtil::create_table('users', array(
+			'id' => array('constraint' => 11, 'type' => 'int'),
+			'client_id' => array('constraint' => 11, 'type' => 'int'),
+			'number' => array('constraint' => 11, 'type' => 'int'),
+			'price' => array('constraint' => 11, 'type' => 'int'),
+			'date' => array('type' => 'datetime'),
+			'created_at' => array('constraint' => 11, 'type' => 'int'),
+			'updated_at' => array('constraint' => 11, 'type' => 'int'),
+			'deleted_at' => array('constraint' => 11, 'type' => 'int'),
+			'created_at' => array('constraint' => 11, 'type' => 'int', 'null' => true),
+			'updated_at' => array('constraint' => 11, 'type' => 'int', 'null' => true),
+
+		), array('id'));
+	}
+
+	public function down()
+	{
+		\DBUtil::drop_table('users');
+	}
+}
