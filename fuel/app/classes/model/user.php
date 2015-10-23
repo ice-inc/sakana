@@ -1,6 +1,6 @@
 <?php
 
-class Model_Order extends \Orm\Model_Soft
+class Model_User extends \Orm\Model_Soft
 {
 	protected static $_properties = array(
 
@@ -12,16 +12,6 @@ class Model_Order extends \Orm\Model_Soft
 		'created_at',
 		'updated_at',
 		'deleted_at',
-	);
-
-	protected static $_has_many = array(
-		'order_child' => array(
-			'key_from' => 'id',
-			'model_to' => 'Model_Order_child',
-			'key_to' => 'order_id',
-			'cascade_save' => true,
-			'cascade_delete' => false
-		)
 	);
 
 	protected static $_observers = array(
@@ -40,6 +30,6 @@ class Model_Order extends \Orm\Model_Soft
 				'mysql_timestamp' => false,
 	);
 
-	protected static $_table_name = 'orders';
+	protected static $_table_name = 'users';
 
 }

@@ -1,28 +1,15 @@
 <?php
 
-class Model_Order_Child extends \Orm\Model_Soft
+class Model_Commodity extends \Orm\Model_Soft
 {
 	protected static $_properties = array(
-
 		'id',
-		'orders_id',
+		'name',
 		'cost',
-		'number',
 		'price',
-		'date',
 		'created_at',
 		'updated_at',
 		'deleted_at',
-	);
-
-	protected static $_belongs_to = array(
-		'order' => array(
-			'key_from' => 'order_id',
-			'model_to' => 'Model_Order',
-			'key_to' => 'id',
-			'cascade_save' => true,
-			'cascade_delete' => false,
-		)
 	);
 
 	protected static $_observers = array(
@@ -41,6 +28,17 @@ class Model_Order_Child extends \Orm\Model_Soft
         'mysql_timestamp' => false,
   );
 
-	protected static $_table_name = 'order_children';
+	public static function validate($factory)
+	{
+		$val = Validation::forge($factory);
+		$val->add_callable('Validation_Japanese');
+		$val->add_field('name', '商品名', 'required|katakana|max_length[50]');
+		$val->add_field('cost', '原価', 'required|valid_string[numeric]');
+		$val->add_field('price', '定価', 'required|valid_string[numeric]');
+
+		return $val;
+	}
+
+	protected static $_table_name = 'commodities';
 
 }
