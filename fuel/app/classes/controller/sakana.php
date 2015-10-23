@@ -74,6 +74,19 @@ class Controller_Sakana extends Controller_Template
 			// トップページへ戻す
 			Response::redirect('sakana/index');
 		}
+		else
+		{
+			//Formの作成
+			$form = Fieldset::forge('commodity');
+			$form->repopulate($form);
+
+			$form->add('name', '商品名', array('type' => 'text', 'placeholder' => '\'));
+			$form->add('cost', '原価', array('type' => 'text'));
+			$form->add('price', '定価', array('type' => 'text'));
+
+			$output = View::forge('sakana/edit');
+			$output->set('form', $form); //formをViewに渡しており、Viewファイルでは$formをechoしています。
+		}
 
 		// model/post.phpで定義された、validatieメソッド実行
 		// validationオブジェクトを$valに代入
@@ -157,6 +170,45 @@ public function action_delete($id = null)
 	{
 		// Commodityモデルから、全データを取得してビューに渡すための配列に入れる
 		$data['commodity'] = Model_Commodity::find('all');
+
+		// validationをチェック
+		$client_val = Model_Client::validate('reservation');
+		$order_val = Model_Order::validate('reservation');
+
+		// validationがOKだった場合
+		if ($client_val->run() and $order_val->run())
+		{
+			// 各POSTデータをモデルオブジェクトとして、$postに代入
+			$post = Model_Client::forge(array(
+				'first_name' => Input::post('first_name'),
+				'last_name' => Input::post('last_name'),
+				'tell' => Input::post('tell'),
+				'email' => Input::post('email'),
+			));
+
+				// 各POSTデータの保存に成功した時
+			if ($post and $post->save())
+			{
+				// 成功したメッセージをフラッシュセッションに入れる
+				Session::set_flash('予約しました');
+				// TOPページへリダイレクト
+				Response::redirect('sakana/resarvation');
+			}
+
+			// 各POSTデータの保存失敗時
+			else
+			{
+			// エラーメッセージをフラッシュセッションに入れる
+			Session::set_flash('エラー', '予約に失敗しました');
+			}
+		}
+		// validationエラーが出たとき
+		else
+		{
+			// validationエラーのメッセージをセットする
+			Session::set_flash('error', $val->error());
+		}
+
 		$data["subnav"] = array('reservation'=> 'active' );
 		$this->template->title = 'Sakana &raquo; 商品予約';
 		$this->template->content = View::forge('sakana/reservation', $data);
