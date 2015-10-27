@@ -64,4 +64,19 @@ class Validation_Japanese
 
         return false;
     }
+
+    /**
+     *
+     */
+    public static function _validation_hirakatakan($val)
+    {
+        if( empty($val) ){ return true; }
+
+        mb_regex_encoding("UTF-8");
+        if (preg_match("/^[ 　一-?朗-鶴ぁ-んァ-ヶーｦ-ﾟ｡-ﾟ0-9０-９]+$/u", $val)) {
+            return true;
+        }
+
+        return false;
+    }
 }
