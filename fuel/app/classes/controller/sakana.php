@@ -15,6 +15,11 @@ class Controller_Sakana extends Controller_Template
 
 	public function action_create()
 	{
+		$data = array();
+		$data['name'] = null;
+		$data['cost'] = null;
+		$data['price'] = null;
+
 		// 投稿ボタンが押され、postされたとき
 		if (Input::method() == 'POST')
 		{
@@ -56,13 +61,17 @@ class Controller_Sakana extends Controller_Template
 		}
 
 		// ビューテンプレート呼び出し
-		$data["subnav"] = array('create'=> 'active' );
+		$data["subnav"] = array('create' => 'active' );
 		$this->template->title = 'Sakana &raquo; 商品登録';
 		$this->template->content = View::forge('sakana/create', $data);
+		$this->template->content = View::forge('sakana/_form', $data);
+
 	}
 
 	public function action_edit($id=null)
 	{
+		$data = array();
+
 		// URLに記事idが含まれていない時、トップページへ戻す
 		is_null($id) and Response::redirect('sakana/index');
 
@@ -74,7 +83,11 @@ class Controller_Sakana extends Controller_Template
 			// トップページへ戻す
 			Response::redirect('sakana/index');
 		}
-		
+
+		// 保存されているデータの呼び出し
+		$data['name'] = $post->name;
+		$data['cost'] = $post->cost;
+		$data['price'] = $post->price;
 
 		// model/post.phpで定義された、validatieメソッド実行
 		// validationオブジェクトを$valに代入
@@ -128,31 +141,33 @@ class Controller_Sakana extends Controller_Template
 		$data["subnav"] = array('reservation'=> 'active' );
 		$this->template->title = 'Sakana &raquo; 商品編集';
 		$this->template->content = View::forge('sakana/edit', $data);
+		$this->template->content = View::forge('sakana/_form', $data);
+
 	}
 
 	// 投稿削除
-public function action_delete($id = null)
-{
-	// URLに記事idが含まれていない時、トップページへ
-	is_null($id) and Response::redirect('sakana/index');
-	// 記事idが見つかった時
-	if ($post = Model_Commodity::find($id))
+	public function action_delete($id = null)
 	{
-		// 該当記事を削除する
-		$post->delete();
-		// 削除に成功したメッセージをセット
-		Session::set_flash('削除しました');
-	}
+		// URLに記事idが含まれていない時、トップページへ
+		is_null($id) and Response::redirect('sakana/index');
+		// 記事idが見つかった時
+		if ($post = Model_Commodity::find($id))
+		{
+			// 該当記事を削除する
+			$post->delete();
+			// 削除に成功したメッセージをセット
+			Session::set_flash('削除しました');
+		}
 
-	// 記事idのデータがモデルから見つからない
-	else
-	{
-		// エラーメッセージをセット
-		Session::set_flash('エラー', '商品を削除できませんでした');
+		// 記事idのデータがモデルから見つからない
+		else
+		{
+			// エラーメッセージをセット
+			Session::set_flash('エラー', '商品を削除できませんでした');
+		}
+		// トップページへ戻す
+		Response::redirect('sakana/index');
 	}
-	// トップページへ戻す
-	Response::redirect('sakana/index');
-}
 
 	public function action_reservation()
 	{
@@ -161,7 +176,7 @@ public function action_delete($id = null)
 
 		// validationをチェック
 		$client_val = Model_Client::validate('reservation');
-		$order_val = Model_Order::validate('reservation');
+		//$order_val = Model_Order::validate('reservation');
 
 		// validationがOKだった場合
 		if ($client_val->run() and $order_val->run())
@@ -194,7 +209,7 @@ public function action_delete($id = null)
 		else
 		{
 			// validationエラーのメッセージをセットする
-			Session::set_flash('error', $val->error());
+			//Session::set_flash('error', $val->error());
 		}
 
 		$data["subnav"] = array('reservation'=> 'active' );
@@ -202,4 +217,17 @@ public function action_delete($id = null)
 		$this->template->content = View::forge('sakana/reservation', $data);
 	}
 
+	public function action_signin()
+	{
+		$data["subnav"] = array('signin'=> 'active' );
+		$this->template->title = 'Sakana';
+		$this->template->content = View::forge('sakana/signin', $data);
+	}
+
+	public function action_signup()
+	{
+		$data["subnav"] = array('signup'=> 'active' );
+		$this->template->title = 'Sakana &raquo; 新規登録';
+		$this->template->content = View::forge('sakana/signup', $data);
+	}
 }
