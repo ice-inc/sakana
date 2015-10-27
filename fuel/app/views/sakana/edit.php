@@ -3,5 +3,4 @@
 	<li class='<?php echo Arr::get($subnav, "create" ); ?>'><?php echo Html::anchor('sakana/create','商品登録');?></li>
 </ul>
 <h2>商品編集</h2>
-
 <?php echo render('sakana/_form'); ?>
