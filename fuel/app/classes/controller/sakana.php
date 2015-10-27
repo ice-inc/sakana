@@ -15,6 +15,11 @@ class Controller_Sakana extends Controller_Template
 
 	public function action_create()
 	{
+		$data = array();
+		$data['name'] = null;
+		$data['cost'] = null;
+		$data['price'] = null;
+
 		// 投稿ボタンが押され、postされたとき
 		if (Input::method() == 'POST')
 		{
@@ -59,6 +64,8 @@ class Controller_Sakana extends Controller_Template
 		$data["subnav"] = array('create' => 'active' );
 		$this->template->title = 'Sakana &raquo; 商品登録';
 		$this->template->content = View::forge('sakana/create', $data);
+		$this->template->content = View::forge('sakana/_form', $data);
+
 	}
 
 	public function action_edit($id=null)
@@ -134,6 +141,8 @@ class Controller_Sakana extends Controller_Template
 		$data["subnav"] = array('reservation'=> 'active' );
 		$this->template->title = 'Sakana &raquo; 商品編集';
 		$this->template->content = View::forge('sakana/edit', $data);
+		$this->template->content = View::forge('sakana/_form', $data);
+
 	}
 
 	// 投稿削除
@@ -211,7 +220,7 @@ class Controller_Sakana extends Controller_Template
 	public function action_signin()
 	{
 		$data["subnav"] = array('signin'=> 'active' );
-		$this->template->title = 'Sakana &raquo; ログイン';
+		$this->template->title = 'Sakana';
 		$this->template->content = View::forge('sakana/signin', $data);
 	}
 
