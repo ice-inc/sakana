@@ -119,7 +119,7 @@ class Controller_Sakana extends Controller_Template
 			}
 		}
 
-			// validationでエラーが出たとき
+        // validationでエラーが出たとき
 		else
 		{
 			// postデータが送られた場合
@@ -174,43 +174,85 @@ class Controller_Sakana extends Controller_Template
 		// Commodityモデルから、全データを取得してビューに渡すための配列に入れる
 		$data['commodity'] = Model_Commodity::find('all');
 
-		// validationをチェック
-		$client_val = Model_Client::validate('reservation');
-		//$order_val = Model_Order::validate('reservation');
+        if (Input::method() == 'POST'){
+            //入力されPOSTされた内容を変数に格納
+            $post = Input::post();
+            // validationをチェック
+            $client_val = Model_Client::validate('reservation');
 
-		// validationがOKだった場合
-		if ($client_val->run() and $order_val->run())
-		{
-			// 各POSTデータをモデルオブジェクトとして、$postに代入
-			$post = Model_Client::forge(array(
-				'first_name' => Input::post('first_name'),
-				'last_name' => Input::post('last_name'),
-				'tell' => Input::post('tell'),
-				'email' => Input::post('email'),
-			));
+            // validationがOKだった場合
+            if ($client_val->run($post))
+            {
+                // validationをチェック
+                $order_child_val = Model_Order_Child::validate('reservation2');
 
-				// 各POSTデータの保存に成功した時
-			if ($post and $post->save())
-			{
-				// 成功したメッセージをフラッシュセッションに入れる
-				Session::set_flash('予約しました');
-				// TOPページへリダイレクト
-				Response::redirect('sakana/resarvation');
-			}
+                // validationがOKだった場合
+                if ($order_child_val->run($post[order_child]))
+                {
 
-			// 各POSTデータの保存失敗時
-			else
-			{
-			// エラーメッセージをフラッシュセッションに入れる
-			Session::set_flash('エラー', '予約に失敗しました');
-			}
-		}
-		// validationエラーが出たとき
-		else
-		{
-			// validationエラーのメッセージをセットする
-			//Session::set_flash('error', $val->error());
-		}
+                    // 各POSTデータをモデルオブジェクトとして、$clientに代入
+                    $client = Model_Client::forge(array(
+                        'first_name' => Input::post('first_name'),
+                        'last_name' => Input::post('last_name'),
+                        'tell' => Input::post('tell'),
+                        'email' => Input::post('email'),
+                    ));
+
+                    // 各POSTデータをモデルオブジェクトとして、$orderに代入
+                    $client->orders[] = Model_Order::forge(array(
+                        'number' => '1',
+                        'price' => '1',
+                        'date' => Input::post('order_child.date'),
+                    ));
+
+                    // POSTされたデータを$order_childに代入
+                    $order_child = Input::post('order_child');
+
+                    // 配列の値が$valueに代入され、配列のキーが$keyに代入される
+                    foreach ($order_child as $key => $value)
+                    {
+                        // 各POSTデータをモデルオブジェクトとして、$order_childに代入
+                        $order->order_children[] = Model_Order_Child::forge(array(
+                            'commodity_id' => $key->number,
+                            'cost' => $value->number * $value->cost,
+                            'number' => $value->number,
+                            'price' => $value->number * $value->price,
+                            'date' => Input::post('date'),
+                        ));
+                    }
+
+                    // 各POSTデータの保存に成功した時
+                    if ($order_child and $order_child->save())
+                    {
+                        // 成功したメッセージをフラッシュセッションに入れる
+                        Session::set_flash('予約しました');
+                        // TOPページへリダイレクト
+                        Response::redirect('sakana/resarvation');
+                    }
+
+                    // 各POSTデータの保存失敗時
+                    else
+                    {
+                        // エラーメッセージをフラッシュセッションに入れる
+                        Session::set_flash('エラー', '予約に失敗しました');
+                    }
+                }
+
+                // validationエラーが出たとき
+                else
+                {
+                    // validationエラーのメッセージをセットする
+                    Session::set_flash('error', $order_child_val->error());
+                }
+            }
+
+            // validationエラーが出たとき
+            else
+            {
+                // validationエラーのメッセージをセットする
+                Session::set_flash('error', $client_val->error());
+            }
+        }
 
 		$data["subnav"] = array('reservation'=> 'active' );
 		$this->template->title = 'Sakana &raquo; 商品予約';

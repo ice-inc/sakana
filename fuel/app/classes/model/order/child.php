@@ -13,6 +13,7 @@ class Model_Order_Child extends \Orm\Model_Soft
 		'created_at',
 		'updated_at',
 		'deleted_at',
+        'commodity_id',
 	);
 
 	protected static $_belongs_to = array(
@@ -39,7 +40,16 @@ class Model_Order_Child extends \Orm\Model_Soft
 	protected static $_soft_delete = array(
         'deleted_at' => 'deletedAt',
         'mysql_timestamp' => false,
-  );
+    );
+    
+    public static function validate($factory)
+    {
+        $val = Validation::forge($factory);
+        $val->add_field('number', '個数', 'required|valid_string[numeric]|max_length[4]');
+        $val->add_field('date', '受取日', 'required|max_length[15]');
+
+        return $val;
+    }
 
 	protected static $_table_name = 'order_children';
 

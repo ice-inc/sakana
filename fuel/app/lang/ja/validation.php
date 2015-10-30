@@ -22,4 +22,6 @@ return array(
 	 'hiragana'        => ':label は ひらがなで入力してください。',
 	 'katakana'        => ':label は 全角カタカナで入力してください。',
 	 'kanji'           => ':label は 漢字で入力してください。',
+	 'hirakata'        => ':label は ひらがな又はカタカナで入力してください。',
+	 'hirakatakan'     => ':label は 日本語で入力してください。',
 );
