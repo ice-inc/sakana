@@ -59,10 +59,10 @@ class Controller_Order extends Controller_Template
                     // 各POSTデータの保存に成功した時
                     if ($client and $client->save())
                     {
+                        // TOPページへリダイレクト
+                        Response::redirect('order/create');
                         // 成功したメッセージをフラッシュセッションに入れる
                         Session::set_flash('予約しました');
-                        // TOPページへリダイレクト
-                        Response::redirect('sakana/reservation');
                     }
 
                     // 各POSTデータの保存失敗時
