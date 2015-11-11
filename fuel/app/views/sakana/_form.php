@@ -1,4 +1,9 @@
-<?php echo Form::open(array("class"=>"form-horizontal")); ?>
+<ul class="nav nav-pills">
+    <li class='<?php echo Arr::get($subnav, "index" ); ?>'><?php echo Html::anchor('sakana/index','商品一覧');?></li>
+    <li class='<?php echo Arr::get($subnav, "create" ); ?>'><?php echo Html::anchor('sakana/create','商品登録');?></li>
+    <li class='<?php echo Arr::get($subnav, "list" ); ?>'><?php echo Html::anchor('list/index','予約一覧');?></li>
+</ul>
+    <?php echo Form::open(array("class"=>"form-horizontal")); ?>
 
     <fieldset>
         <div class="row">

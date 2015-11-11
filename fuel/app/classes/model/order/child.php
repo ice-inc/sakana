@@ -6,6 +6,7 @@ class Model_Order_Child extends \Orm\Model_Soft
 
         'id',
         'orders_id',
+        'commodity_id',
         'cost',
         'number',
         'price',
@@ -13,18 +14,28 @@ class Model_Order_Child extends \Orm\Model_Soft
         'created_at',
         'updated_at',
         'deleted_at',
-        'commodity_id',
     );
 
     protected static $_belongs_to = array(
         'order' => array(
-            'key_from' => 'order_id',
+            'key_from' => 'orders_id',
             'model_to' => 'Model_Order',
             'key_to' => 'id',
             'cascade_save' => true,
             'cascade_delete' => false,
         )
     );
+    
+    protected static $_has_one = array(
+        'commodity' => array(
+            'key_from' => 'commodity_id',
+            'model_to' => 'Model_Commodity',
+            'key_to' => 'id',
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        )
+    );
+
 
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(

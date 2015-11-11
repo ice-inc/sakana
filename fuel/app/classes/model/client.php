@@ -44,8 +44,8 @@ class Model_Client extends \Orm\Model_Soft
     {
         $val = Validation::forge($factory);
         $val->add_callable('Validation_Japanese');
-        $val->add_field('first_name', '姓', 'required|hirakatakan|max_length[50]');
-        $val->add_field('last_name', '名', 'required|hirakatakan|max_length[50]');
+        $val->add_field('first_name', '名', 'required|hirakatakan|max_length[50]');
+        $val->add_field('last_name', '姓', 'required|hirakatakan|max_length[50]');
         $val->add_field('tell', '電話番号', 'required|valid_string[numeric]|max_length[15]|min_length[5]');
         $val->add_field('email', 'メールアドレス', 'required|valid_email');
 

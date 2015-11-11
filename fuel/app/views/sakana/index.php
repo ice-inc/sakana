@@ -1,8 +1,8 @@
 <ul class="nav nav-pills">
 	<li class='<?php echo Arr::get($subnav, "index" ); ?>'><?php echo Html::anchor('sakana/index','商品一覧');?></li>
 	<li class='<?php echo Arr::get($subnav, "create" ); ?>'><?php echo Html::anchor('sakana/create','商品登録');?></li>
+    <li class='<?php echo Arr::get($subnav, "list" ); ?>'><?php echo Html::anchor('list/index','予約一覧');?></li>
 </ul>
-<h2>商品一覧</h2>
 <br>
 <?php if ($commodity): ?>
 <table class="table table-striped">

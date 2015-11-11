@@ -11,6 +11,7 @@ class Controller_Sakana extends Controller_Template
         $data["subnav"] = array('index'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品一覧';
         $this->template->content = View::forge('sakana/index', $data);
+
     }
 
     public function action_create()
@@ -167,19 +168,5 @@ class Controller_Sakana extends Controller_Template
         }
         // トップページへ戻す
         Response::redirect('sakana/index');
-    }
-
-    public function action_signin()
-    {
-        $data["subnav"] = array('signin'=> 'active' );
-        $this->template->title = 'Sakana';
-        $this->template->content = View::forge('sakana/signin', $data);
-    }
-
-    public function action_signup()
-    {
-        $data["subnav"] = array('signup'=> 'active' );
-        $this->template->title = 'Sakana &raquo; 新規登録';
-        $this->template->content = View::forge('sakana/signup', $data);
     }
 }
