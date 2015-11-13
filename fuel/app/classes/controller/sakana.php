@@ -2,21 +2,35 @@
 
 class Controller_Sakana extends Controller_Template
 {
+    public function before()
+    {
+        // この行がないと、テンプレートが動作しない!
+        parent::before(); 
+        
+        //未ログインの場合、ログインページへリダイレクト
+        if(!Auth::check()){
+            Response::redirect('user/login');
+        }
+    }
 
     public function action_index()
     {
+        //$data['date'] = Date::time()->format('%Y%m%d');
+        $data['date'] = Date::forge()->get_timestamp();
         // POSTモデルから、全データを取得してビューに渡すための配列に入れる
         $data['commodity'] = Model_Commodity::find('all');
         // ビューテンプレート
         $data["subnav"] = array('index'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品一覧';
         $this->template->content = View::forge('sakana/index', $data);
-
     }
 
     public function action_create()
     {
         $data = array();
+        //$data['date'] = Date::time()->format('%Y%m%d');
+        $data['date'] = Date::forge()->get_timestamp();
+        
         $data['name'] = null;
         $data['cost'] = null;
         $data['price'] = null;
@@ -72,7 +86,9 @@ class Controller_Sakana extends Controller_Template
     public function action_edit($id=null)
     {
         $data = array();
-
+        //$data['date'] = Date::time()->format('%Y%m%d');
+        $data['date'] = Date::forge()->get_timestamp();
+        
         // URLに記事idが含まれていない時、トップページへ戻す
         is_null($id) and Response::redirect('sakana/index');
 
@@ -139,6 +155,7 @@ class Controller_Sakana extends Controller_Template
             // 複数のビューに$postを渡せるようにset_globalで、ビューを呼び出す
             $this->template->set_global('sakana', $post, false);
         }
+        
         $data["subnav"] = array('reservation'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品編集';
         $this->template->content = View::forge('sakana/edit', $data);

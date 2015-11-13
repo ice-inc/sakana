@@ -33,6 +33,15 @@ class Model_Order extends \Orm\Model_Soft
             'cascade_delete' => false,
         )
     );
+    
+    public static function validate($factory)
+    {
+        $val = Validation::forge($factory);
+
+        $val->add_field('date', '受取日', 'required|max_length[15]');
+
+        return $val;
+    }
 
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(

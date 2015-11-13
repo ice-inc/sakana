@@ -2,9 +2,13 @@
 
 class Controller_Order extends Controller_Template
 {
+
     public function action_create()
     {
         $data = array();
+        //$data['date'] = Date::time()->format('%Y%m%d');
+        $data['date'] = Date::forge()->get_timestamp();
+        
         // Commodityモデルから、全データを取得してビューに渡すための配列に入れる
         $data['commodity'] = Model_Commodity::find('all');
 
@@ -104,7 +108,7 @@ class Controller_Order extends Controller_Template
             }
         }
 
-        $data["subnav"] = array('create'=> 'active' );
+        $data["subnav"] = array('order'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品予約';
         $this->template->content = View::forge('order/create', $data);
     }
