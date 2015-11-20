@@ -11,6 +11,16 @@ class Model_Commodity extends \Orm\Model_Soft
 		'updated_at',
 		'deleted_at',
 	);
+    
+    protected static $_belongs_to = array(
+        'order_child' => array(
+            'key_from' => 'id',
+            'model_to' => 'Model_Order_Child',
+            'key_to' => 'commodity_id',
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        )
+    );
 
 	protected static $_observers = array(
 		'Orm\Observer_CreatedAt' => array(

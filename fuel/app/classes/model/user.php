@@ -2,17 +2,18 @@
 
 class Model_User extends \Orm\Model_Soft
 {
-	protected static $_properties = array(
-
-		'id',
-		'client_id',
-		'number',
-		'price',
-		'date',
-		'created_at',
-		'updated_at',
-		'deleted_at',
-	);
+    protected static $_properties = array(
+        'id',
+        'username',
+        'password',
+        'group',
+        'email',
+        'last_login',
+        'login_hash',
+        'profile_fields',
+        'created_at',
+        'updated_at'
+    );
 
 	protected static $_observers = array(
 		'Orm\Observer_CreatedAt' => array(
