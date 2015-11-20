@@ -33,11 +33,7 @@
           <ul class="dropdown-menu">
             <li><?= Html::anchor('react', 'ベーシックサンプル') ?></li>
             <li><?= Html::anchor('react/click_counter', 'クリックカウンター') ?></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
+            <li><?= Html::anchor('react/basic_commonjs', 'ベーシックcommonjs') ?></li>
           </ul>
         </li>
       </ul>

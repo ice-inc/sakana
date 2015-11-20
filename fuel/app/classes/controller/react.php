@@ -25,4 +25,10 @@ class Controller_react extends Controller_Template
         $this->template->content = View::forge('examples/basic-click-counter/index.php');
     }
 
+    public function action_basic_commonjs()
+    {
+        $this->template->title = 'basic commonjs';
+        $this->template->content = View::forge('examples/basic-commonjs/index.php');
+    }
+
 }
