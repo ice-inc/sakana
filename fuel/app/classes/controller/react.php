@@ -15,9 +15,14 @@ class Controller_react extends Controller_Template
 
     public function action_index()
     {
-        $data["subnav"] = array('index'=> 'active');
-        $this->template->title = 'test';
-        $this->template->content = View::forge('examples/basic/index.php', $data);
+        $this->template->title = 'basic';
+        $this->template->content = View::forge('examples/basic/index.php');
+    }
+
+    public function action_click_counter()
+    {
+        $this->template->title = 'click counter';
+        $this->template->content = View::forge('examples/basic-click-counter/index.php');
     }
 
 }
