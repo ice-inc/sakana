@@ -31,4 +31,22 @@ class Controller_react extends Controller_Template
         $this->template->content = View::forge('examples/basic-commonjs/index.php');
     }
 
+    public function action_basic_jsx()
+    {
+        $this->template->title = 'basic jsx';
+        $this->template->content = View::forge('examples/basic-jsx/index.php');
+    }
+
+    public function action_basic_jsx_external()
+    {
+        $this->template->title = 'basic jsx external';
+        $this->template->content = View::forge('examples/basic-jsx-external/index.php');
+    }
+
+    public function action_jquery_bootstrap()
+    {
+        $this->template->title = 'jquery bootstrap';
+        $this->template->content = View::forge('examples/jquery-bootstrap/index.php');
+    }
+
 }

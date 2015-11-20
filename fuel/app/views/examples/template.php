@@ -34,6 +34,9 @@
             <li><?= Html::anchor('react', 'ベーシックサンプル') ?></li>
             <li><?= Html::anchor('react/click_counter', 'クリックカウンター') ?></li>
             <li><?= Html::anchor('react/basic_commonjs', 'ベーシックcommonjs') ?></li>
+            <li><?= Html::anchor('react/basic_jsx', 'JSX') ?></li>
+            <li><?= Html::anchor('react/basic_jsx_external', 'JSX EXTERNAL') ?></li>
+            <li><?= Html::anchor('react/jquery_bootstrap', 'jQuery Bootstrap') ?></li>
           </ul>
         </li>
       </ul>
