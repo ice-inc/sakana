@@ -2,7 +2,7 @@
 
 class Controller_User extends Controller_Base
 {
-    public $template = 'admin/template';
+    public $template = 'template';
 
     // すべてのアクションが実行される間にされる処理
 	public function before()
