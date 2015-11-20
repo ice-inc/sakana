@@ -45,4 +45,3 @@
         </div>
     </fieldset>
     <?php echo Form::close(); ?>
-    <?php echo Asset::js('jquery-1.11.3.min.js');?>
