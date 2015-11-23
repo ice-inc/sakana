@@ -1,14 +1,15 @@
-<div class="center-block" style="width: 100%; text-align: center;">
+<div id="result">
+   <div class="center-block" style="width: 100%; text-align: center;">
     <h3><?php echo $formatted_date;?></h3>
 
     <h1 style="font-size: 10em;">
         <?php echo Html::anchor('list/index/'.$before,
                                 '',
-                                array('id'=>'before', 'class'=>"btn btn-default glyphicon glyphicon-chevron-left", 'aria-hidden'=>"true"));?>
+                                array('class'=>"btn btn-default glyphicon glyphicon-chevron-left", 'aria-hidden'=>"true"));?>
         <?php echo $day_of_month;?>
         <?php echo Html::anchor('list/index/'.$next,
                                 '',
-                                array('id'=>'next', 'class'=>"btn btn-default glyphicon glyphicon-chevron-right", 'aria-hidden'=>"true"));?>
+                                array('class'=>"btn btn-default glyphicon glyphicon-chevron-right", 'aria-hidden'=>"true"));?>
     </h1>
 </div>
 <br>
@@ -69,3 +70,4 @@
 </div>
 
 <?php endif; ?>
+</div>

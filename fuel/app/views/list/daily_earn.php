@@ -1,17 +1,36 @@
-
 <br>
+<div class="btn-toolbar">
+    <div class="btn-group">
+        <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$before);?>'" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>           
+        </button>
+        <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$next);?>'" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        </button>
+        <button id="calendar" type="button" class="btn btn-default" onclick="true">
+            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div class="btn-group">
+        <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/'.$date);?>'" type="button" class="btn btn-default">月別へ</button>
+        <button onclick="location.href='<?php echo Uri::create('list/yearly_earn/');?>'" type="button" class="btn btn-default">年別へ</button>
+    </div>
+</div>
+<br>
+<div class="center-block" style="width: 100%; text-align: center;">
+    <h1 style="margin:auto"><?php echo Date::forge($this_date)->format('%Y');?>年<?php echo Date::forge($this_date)->format('%m');?>月</h1>
+</div>
 <div class="table-responsive">
     <table class="table table-bordered table-condensed table-hover">
         <thead>
             <tr class="info">
                 <th>
                     <div class="center-block" style="width: 100%; text-align: center;">
-                        <?php echo $month;?>月
                     </div>
                 </th>
                 <th>
                     <div class="center-block" style="width: 100%; text-align: center;">
-                        今年売上
+                        売上
                     </div>
                 </th>
                 <th>
@@ -51,7 +70,7 @@
                 </th>
                 <th>
                     <div class="center-block" style="width: 100%; text-align: center;">
-                        今年累計
+                        今月累計
                     </div>
                 </th>
                 <th>
@@ -67,7 +86,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach($earn as $key => $value):?>
+            <?php foreach($daily as $key => $value):?>
             <tr>
                 <th>
                     <div class="pull-right">
@@ -76,12 +95,12 @@
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo $value['sales'];?>
+                        <?php echo number_format($value['sales']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo $value['last_sales'];?>
+                        <?php echo number_format($value['last_sales']);?>
                     </div>
                 </th>
                 <th>
@@ -91,27 +110,27 @@
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo $value['number_of_guest'];?>
+                        <?php echo number_format($value['number_of_guest']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo $value['number_of_guest2'];?>
+                        <?php echo number_format($value['number_of_guest2']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo $value['total_item'];?>
+                        <?php echo number_format($value['total_item']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo round($value['average'], 0);?>
+                        <?php echo number_format(round($value['average'], 0));?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo round($value['average2'], 1);?>
+                        <?php echo number_format(round($value['average2'], 1));?>
                     </div>
                 </th>
                 <th>
@@ -131,4 +150,3 @@
         </tbody>
     </table>
 </div>
-<?php //echo print_r($year_on_year);?>

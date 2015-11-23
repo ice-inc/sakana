@@ -228,7 +228,7 @@ class Controller_List extends Controller_Template
         $data['next_year'] = strtotime('+1 year', $year);
         $data['before_year'] = strtotime('-1 year', $year);
 
-        // 日付に一致したデータを集計
+        // 日別に一致したデータを集計
         $data['result_daily'] = DB::query(
             "SELECT commodities.name, date, sum(number) AS sum_number, sum(order_children.price) AS sales
             FROM `order_children`
@@ -238,6 +238,7 @@ class Controller_List extends Controller_Template
             ORDER BY sum_number DESC"
         )->execute()->as_array();
 
+        // 月別にデータ集計
         $data['result_monthly'] = DB::query(
             "SELECT commodities.name, sum(number) AS sum_number, sum(order_children.price) AS sales
             FROM `order_children` INNER JOIN commodities ON commodity_id = commodities.id
@@ -246,6 +247,7 @@ class Controller_List extends Controller_Template
             ORDER BY sum_number DESC"
         )->execute()->as_array();
 
+        // 年別にデータ集計
         $data['result_yearly'] = DB::query(
             "SELECT commodities.name, sum(number) AS sum_number, sum(order_children.price) AS sales
             FROM `order_children`
@@ -269,13 +271,15 @@ class Controller_List extends Controller_Template
         $this->template->nav = View::forge('template/nav', $data);
     }
 
-    public function action_earn($date)
+    public function action_daily_earn($date)
     {
         $data = array();
 
         $data['date'] = Date::forge()->get_timestamp();
         $data['month'] = Date::forge($date)->format('%m');
 
+        $year = Date::forge($date)->format('%Y');
+        $year_next = $year + 1;
         $month = Date::forge($date)->format('%Y-%m');
         // 月初と月末の日付を取得
         $first_date = date('Y-m-d', strtotime('first day of'. $month));
@@ -302,7 +306,7 @@ class Controller_List extends Controller_Template
         }
 
         // 今年と前年の月初めから月までの日付を持った売上テーブルを生成
-        $earn = DB::query(
+        $data['daily'] = DB::query(
             "SELECT ADDDATE('$first_date', V.Number) as date,
                 IFNULL(Sum(O1.`price`),0) as sales,
                 ADDDATE('$first_date2', V.Number) as last_date,
@@ -322,23 +326,104 @@ class Controller_List extends Controller_Template
                 GROUP BY ADDDATE('$first_date', V.Number)"
         )->execute()->as_array();
 
-        foreach($earn as $key => $value)
-        {
-            if($value['last_sales'] != 0)
-            {
-                $data['year_on_year'][$key] = round($value['sales'] / $value['last_sales'] * 100, 1);
-            }
-            else
-            {
-                $data['year_on_year'][$key] = 'null';
+        // 表示されている日付の前後の月を計算
+        $data['next'] = strtotime('+1 month', $date);
+        $data['before'] = strtotime('-1 month', $date);
+        $data['this_date'] = $date;
 
-            }
-        }
-
-        $data['earn'] = $earn;
         $data["subnav"] = array('earn'=> 'active' );
         $this->template->title = 'Sakana &raquo; 売り上げ';
-        $this->template->content = View::forge('list/earn', $data);
+        $this->template->content = View::forge('list/daily_earn', $data);
+        $this->template->nav = View::forge('template/nav', $data);
+    }
+    
+    public function action_monthly_earn($date)
+    {
+        $data = array();
+
+        $data['date'] = Date::forge()->get_timestamp();
+
+        $year = Date::forge($date)->format('%Y');
+        $year_next = $year + 1;
+
+        // テーブルを選択
+        $query = DB::query("SELECT * FROM mst_digit");
+        $data['query'] = $query->execute();
+
+        // nullの場合、データをセットしビューを生成
+        if($query->execute() == null)
+        {
+            for($i = 0; $i < 10; $i++){
+                DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
+            }
+            DB::query(
+                "CREATE VIEW `vw_sequence99` AS
+                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+            )->execute();
+        }
+
+        // 月ごとの売上累計
+        $data['monthly'] = DB::query(
+            "SELECT DATE_FORMAT(date, '%Y-%m') AS date, 
+            sum(number) AS sum_number, 
+            sum(order_children.price) AS sales,
+            COUNT(DISTINCT orders_id) as number_of_guest
+            FROM `order_children`
+            WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN '$year-01' AND '$year-12'
+            GROUP BY DATE_FORMAT(date, '%Y-%m')
+            ORDER BY DATE_FORMAT(date, '%Y-%m') ASC"
+        )->execute()->as_array();
+        
+        // 表示されている日付の前後の日付を計算
+        $data['next'] = strtotime('+1 year', $date);
+        $data['before'] = strtotime('-1 year', $date);
+        $data['this_date'] = $date;
+
+        $data["subnav"] = array('earn'=> 'active' );
+        $this->template->title = 'Sakana &raquo; 売り上げ';
+        $this->template->content = View::forge('list/monthly_earn', $data);
+        $this->template->nav = View::forge('template/nav', $data);
+    }
+    
+    public function action_yearly_earn()
+    {
+        $data = array();
+
+        $data['date'] = Date::forge()->get_timestamp();
+
+        // テーブルを選択
+        $query = DB::query("SELECT * FROM mst_digit");
+        $data['query'] = $query->execute();
+
+        // nullの場合、データをセットしビューを生成
+        if($query->execute() == null)
+        {
+            for($i = 0; $i < 10; $i++){
+                DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
+            }
+            DB::query(
+                "CREATE VIEW `vw_sequence99` AS
+                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+            )->execute();
+        }
+
+        // 年ごとの売上累計
+        $data['yearly'] = DB::query(
+            "SELECT DATE_FORMAT(date, '%Y') AS date, 
+            sum(number) AS sum_number, 
+            sum(order_children.price) AS sales,
+            COUNT(DISTINCT orders_id) as number_of_guest
+            FROM `order_children`
+            WHERE DATE_FORMAT(date, '%Y') BETWEEN '2015' AND '2030'
+            GROUP BY DATE_FORMAT(date, '%Y')
+            ORDER BY DATE_FORMAT(date, '%Y') ASC"
+        )->execute()->as_array();
+
+        $data["subnav"] = array('earn'=> 'active' );
+        $this->template->title = 'Sakana &raquo; 売り上げ';
+        $this->template->content = View::forge('list/yearly_earn', $data);
         $this->template->nav = View::forge('template/nav', $data);
     }
 }
