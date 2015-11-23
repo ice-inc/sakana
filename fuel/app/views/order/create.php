@@ -1,14 +1,3 @@
-<ul class="nav nav-pills">
-    <li class='<?php echo Arr::get($subnav, "index" ); ?>'><?php echo Html::anchor('sakana/index','商品一覧');?></li>
-    <li class='<?php echo Arr::get($subnav, "create" ); ?>'><?php echo Html::anchor('sakana/create','商品登録');?></li>
-    <li class='<?php echo Arr::get($subnav, "list" ); ?>'><?php echo Html::anchor('list/index/'.$date,'予約一覧');?></li>
-    <li class='<?php echo Arr::get($subnav, "ranking" ); ?>'><?php echo Html::anchor('list/ranking','予約ランキング');?></li>
-    <li class='<?php echo Arr::get($subnav, "earn" ); ?>'><?php echo Html::anchor('list/earn','売り上げ');?></li>
-    <li class='<?php echo Arr::get($subnav, "order" ); ?>'><?php echo Html::anchor('order/create','予約');?></li>
-    <li class='<?php echo Arr::get($subnav, "logout" ); ?>'><?php echo Html::anchor('user/logout','ログアウト');?></li>
-
-</ul>
-
 <h2>予約</h2>
 <br>
 
@@ -16,24 +5,6 @@
 
     <fieldset>
         <?php echo Form::open(array('name'=>'form1'));?>
-
-        <script type="text/javascript">
-            var price = function() {
-                <?php foreach ($commodity as $item): ?>
-
-                    var elements<?php echo $item->id;?> = document.getElementsByName('<?php echo "order_child";?>');
-                    var number<?php echo $item->id;?> = elements<?php echo $item->id;?>[<?php echo $item->id;?>][number].value;
-                    var price<?php echo $item->id;?> = number<?php echo $item->id;?> * <?php echo $item->price;?>;
-                    var element<?php echo $item->id;?> = document.getElementsByName('<?php echo "order_child";?>');
-                    var cost<?php echo $item->id;?> = element<?php echo $item->id;?>[<?php echo $item->id;?>][cost];
-                    cost<?php echo $item->id;?>.value = price<?php echo $item->id;?>;
-
-                var price<?php echo $item->id;?> = document.form1.elements['order_child[<?php echo $item->id;?>][number]'][<?php echo $item->id;?>][number].value * <?php echo $item->price;?>;
-                document.form1.elements['order_child[<?php echo $item->id;?>][cost]'][<?php echo $item->id;?>][cost].value = price<?php echo $item->id;?>;
-
-                <?php endforeach; ?>
-            };
-        </script>
 
         <div class="form-inline">
             <div class="row">
@@ -184,8 +155,9 @@
 
 </fieldset>
 
-<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
-<?php echo Asset::js(array('jquery-1.11.3.min.js', 'jquery-ui.min.js')); ?>
+<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/cupertino/jquery-ui.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>
 <script type="text/javascript">
     $(function() {
