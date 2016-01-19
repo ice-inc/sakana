@@ -2,7 +2,7 @@
 <div class="btn-toolbar">
     <div class="btn-group">
         <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$date);?>'" type="button" class="btn btn-default">日別へ</button>
-        <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/.$date');?>'" type="button" class="btn btn-default">月別へ</button>
+        <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/'.$date);?>'" type="button" class="btn btn-default">月別へ</button>
     </div>
 </div>
 <br>
@@ -38,7 +38,7 @@
                     <tr>
                         <th>
                             <div class="pull-right">
-                                <?php echo date('Y', strtotime($value['date']));?>年
+                                <?php echo $value['date'];?>年
                             </div>
                         </th>
                         <th>
@@ -48,12 +48,12 @@
                         </th>
                         <th>
                             <div class="pull-right">
-                                <?php echo number_format($value['sum_number']);?>
+                                <?php echo number_format($value['number_of_guest']);?>
                             </div>
                         </th>
                         <th>
                             <div class="pull-right">
-                                <?php echo number_format($value['number_of_guest']);?>
+                                <?php echo number_format($value['sum_number']);?>
                             </div>
                         </th>
                     </tr>

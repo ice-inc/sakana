@@ -18,6 +18,7 @@ class Controller_List extends Controller_Template
     public function action_index($date = null)
     {
         $data = array();
+
         // タイムスタンプをフォーマット
         $now = Date::forge($date)->format('%Y/%m/%d');
 
@@ -45,7 +46,6 @@ class Controller_List extends Controller_Template
         $data['formatted_date'] = Date::forge($date)->format('%Y年%m月');
         $data['day_of_month'] = Date::forge($date)->format('%d日');
         $data['date'] = Date::forge()->get_timestamp();
-
 
         $data["subnav"] = array('list'=> 'active' );
         $this->template->title = 'Sakana &raquo; 予約一覧';
@@ -229,33 +229,65 @@ class Controller_List extends Controller_Template
         $data['before_year'] = strtotime('-1 year', $year);
 
         // 日別に一致したデータを集計
-        $data['result_daily'] = DB::query(
-            "SELECT commodities.name, date, sum(number) AS sum_number, sum(order_children.price) AS sales
-            FROM `order_children`
-            INNER JOIN commodities ON commodity_id = commodities.id
-            WHERE order_children.date = '$formatted_day'
-            GROUP BY commodity_id
-            ORDER BY sum_number DESC"
-        )->execute()->as_array();
+        $data['result_daily'] = DB::select
+            (
+                "commodities.name",
+                DB::expr("sum(number) AS sum_number"), 
+                DB::expr("sum(order_children.price) AS sales")
+            )
+            ->from("order_children")
+            ->join("commodities", "inner")
+            ->on("commodity_id", "=", "commodities.id")
+            ->where("date", "=", $formatted_day)
+            ->group_by("commodity_id")
+            ->order_by("sum_number", "desc")
+            ->execute()->as_array();
 
         // 月別にデータ集計
-        $data['result_monthly'] = DB::query(
-            "SELECT commodities.name, sum(number) AS sum_number, sum(order_children.price) AS sales
-            FROM `order_children` INNER JOIN commodities ON commodity_id = commodities.id
-            WHERE DATE_FORMAT(date, '%Y/%m') = '$formatted_month'
-            GROUP BY commodity_id
-            ORDER BY sum_number DESC"
-        )->execute()->as_array();
+        $data['result_monthly'] = DB::select
+            (
+                "commodities.name",
+                DB::expr("sum(number) AS sum_number"), 
+                DB::expr("sum(order_children.price) AS sales")
+            )
+            ->from("order_children")
+            ->join("commodities", "inner")
+            ->on("commodity_id", "=", "commodities.id")
+            ->where(DB::expr("DATE_FORMAT(date, '%Y/%m')"), $formatted_month)
+            ->group_by("commodity_id")
+            ->order_by("sum_number", "desc")
+            ->execute()->as_array();
 
         // 年別にデータ集計
-        $data['result_yearly'] = DB::query(
-            "SELECT commodities.name, sum(number) AS sum_number, sum(order_children.price) AS sales
-            FROM `order_children`
-            INNER JOIN commodities ON commodity_id = commodities.id
-            WHERE DATE_FORMAT(date, '%Y') = '$formatted_year'
-            GROUP BY commodity_id
-            ORDER BY sum_number DESC"
-        )->execute()->as_array();
+        $data['result_yearly'] = DB::select
+            (
+                "commodities.name",
+                DB::expr("sum(number) AS sum_number"), 
+                DB::expr("sum(order_children.price) AS sales")
+            )
+            ->from("order_children")
+            ->join("commodities", "inner")
+            ->on("commodity_id", "=", "commodities.id")
+            ->where(DB::expr("DATE_FORMAT(date, '%Y')"), $formatted_year)
+            ->group_by("commodity_id")
+            ->order_by("sum_number", "desc")
+            ->execute()->as_array();
+
+        /*$data['result'] = DB::select(
+                'commodities.name',
+                DB::expr("SUM(CASE order_children.date WHEN $formatted_day THEN number ELSE 0 END ) as day_sum_number"),
+                DB::expr("SUM(CASE order_children.date WHEN $formatted_day THEN order_children.price ELSE 0 END ) as day_sales"),
+                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y/%m') WHEN $formatted_month THEN number ELSE 0 END ) as month_sum_number"),
+                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y/%m') WHEN $formatted_month THEN order_children.price ELSE 0 END ) as month_sales"),
+                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y') WHEN $formatted_year THEN number ELSE 0 END ) as year_sum_number"),
+                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y') WHEN $formatted_year THEN order_children.price ELSE 0 END ) as year_sales")
+            )
+            ->from('order_children')
+            ->join('commodities', 'inner')
+            ->on('order_children.commodity_id', '=', 'commodities.id')
+            ->group_by('commodity_id')
+            ->order_by('sum_number', 'desc')
+            ->execute()->as_array();*/
 
         $data['date'] = Date::forge()->get_timestamp();
         $data['day'] = $day;
@@ -295,36 +327,62 @@ class Controller_List extends Controller_Template
         // nullの場合、データをセットしビューを生成
         if($query->execute() == null)
         {
-            for($i = 0; $i < 10; $i++){
+            for($i = 0; $i < 10; $i++)
+            {
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
-            DB::query(
-                "CREATE VIEW `vw_sequence99` AS
-                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
-                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-            )->execute();
+            DB::query
+                (
+                    "CREATE VIEW `vw_sequence99` AS
+                    SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                    FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+                )
+                ->execute();
         }
 
         // 今年と前年の月初めから月までの日付を持った売上テーブルを生成
-        $data['daily'] = DB::query(
-            "SELECT ADDDATE('$first_date', V.Number) as date,
-                IFNULL(Sum(O1.`price`),0) as sales,
-                ADDDATE('$first_date2', V.Number) as last_date,
-                IFNULL(Sum(O2.`price`),0) as last_sales,
-                Sum(O1.`price`) / Sum(O2.`price`) * 100 as year_on_year,
-                COUNT(DISTINCT O1.orders_id) as number_of_guest,
-                COUNT(DISTINCT O2.orders_id) as number_of_guest2,
-                IFNULL(Sum(O1.`number`),0) as total_item,
-                IFNULL(sum(O1.price)/COUNT(DISTINCT O1.orders_id),0) as average,
-                IFNULL(Sum(O1.`number`)/COUNT(DISTINCT O1.orders_id),0) as average2
-                FROM vw_sequence99 as V
-                LEFT JOIN order_children as O1
-                ON ADDDATE('$first_date', V.Number) = DATE(O1.`date`)
-                LEFT JOIN order_children as O2
-                ON ADDDATE('$first_date2', V.Number) = DATE(O2.`date`)
-                WHERE ADDDATE('$first_date', V.Number) BETWEEN '$first_date' AND '$last_date'
-                GROUP BY ADDDATE('$first_date', V.Number)"
-        )->execute()->as_array();
+        $data['daily'] = DB::select
+            (
+                DB::expr("ADDDATE('$first_date', V.Number) as date"),
+                DB::expr("IFNULL(Sum(DISTINCT O1.price), 0) as sales"),
+                DB::expr("ADDDATE('$first_date2', V.Number) as last_date"),
+                DB::expr("IFNULL(Sum(DISTINCT O2.price), 0) as last_sales"),
+                DB::expr("SUM(DISTINCT O1.price) / Sum(DISTINCT O2.price) * 100 as year_on_year"),
+                DB::expr("COUNT(DISTINCT O1.orders_id) as number_of_guest"),
+                DB::expr("COUNT(DISTINCT O2.orders_id) as number_of_guest2"),
+                DB::expr("IFNULL(Sum(DISTINCT O1.number), 0) as total_item"),
+                DB::expr("IFNULL(sum(DISTINCT O1.price)/COUNT(DISTINCT O1.orders_id),0) as average"),
+                DB::expr("IFNULL(Sum(DISTINCT O1.number)/COUNT(DISTINCT O1.orders_id),0) as average2")
+            )
+            ->from(array("vw_sequence99", "V"))
+            ->join(array("order_children", "O1"), "left")
+            ->on(DB::expr("ADDDATE('$first_date', V.Number)"), "=", DB::expr("DATE(O1.`date`)"))
+            ->join(array("order_children", "O2"), "left")
+            ->on(DB::expr("ADDDATE('$first_date2', V.Number)"), "=", DB::expr("DATE(O2.`date`)"))
+            ->where(DB::expr("ADDDATE('$first_date', V.Number)"), "BETWEEN", DB::expr("'$first_date' AND '$last_date'"))
+            ->group_by(DB::expr("ADDDATE('$first_date', V.Number)"))
+            ->execute()->as_array();
+
+        // 累計を求めるための計算を行う
+        $current_total = 0;
+        $last_total = 0;
+        foreach($data['daily'] as $key => $values)
+        {
+            $current_total += $values['sales'];
+            $last_total += $values['last_sales'];
+            if ($last_total != 0)
+            {
+                $year_on_year = $current_total / $last_total * 100;
+            }
+            else
+            {
+                $year_on_year = 0;
+            }
+
+            $data['daily'][$key] += array('current_total' => $current_total);
+            $data['daily'][$key] += array('last_total' => $last_total);
+            $data['daily'][$key] += array('year_on_year_total' => $year_on_year);
+        }
 
         // 表示されている日付の前後の月を計算
         $data['next'] = strtotime('+1 month', $date);
@@ -336,7 +394,7 @@ class Controller_List extends Controller_Template
         $this->template->content = View::forge('list/daily_earn', $data);
         $this->template->nav = View::forge('template/nav', $data);
     }
-    
+
     public function action_monthly_earn($date)
     {
         $data = array();
@@ -356,25 +414,29 @@ class Controller_List extends Controller_Template
             for($i = 0; $i < 10; $i++){
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
-            DB::query(
-                "CREATE VIEW `vw_sequence99` AS
-                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
-                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-            )->execute();
+            DB::query
+                (
+                    "CREATE VIEW `vw_sequence99` AS
+                    SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                    FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+                )
+                ->execute();
         }
 
         // 月ごとの売上累計
-        $data['monthly'] = DB::query(
-            "SELECT DATE_FORMAT(date, '%Y-%m') AS date, 
-            sum(number) AS sum_number, 
-            sum(order_children.price) AS sales,
-            COUNT(DISTINCT orders_id) as number_of_guest
-            FROM `order_children`
-            WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN '$year-01' AND '$year-12'
-            GROUP BY DATE_FORMAT(date, '%Y-%m')
-            ORDER BY DATE_FORMAT(date, '%Y-%m') ASC"
-        )->execute()->as_array();
-        
+        $data['monthly'] = DB::select
+            (
+                DB::expr("DATE_FORMAT(date, '%Y-%m') AS date"),
+                DB::expr("SUM(number) AS sum_number"),
+                DB::expr("SUM(order_children.price) AS sales"),
+                DB::expr("COUNT(DISTINCT orders_id) AS number_of_guest")
+            )
+            ->from("order_children")
+            ->where(DB::expr("DATE_FORMAT(date, '%Y-%m')"), "BETWEEN", DB::expr("'$year-01' AND '$year-12'"))
+            ->group_by(DB::expr("DATE_FORMAT(date, '%Y-%m')"))
+            ->order_by(DB::expr("DATE_FORMAT(date, '%Y-%m')"), "asc")
+            ->execute()->as_array();
+
         // 表示されている日付の前後の日付を計算
         $data['next'] = strtotime('+1 year', $date);
         $data['before'] = strtotime('-1 year', $date);
@@ -385,7 +447,7 @@ class Controller_List extends Controller_Template
         $this->template->content = View::forge('list/monthly_earn', $data);
         $this->template->nav = View::forge('template/nav', $data);
     }
-    
+
     public function action_yearly_earn()
     {
         $data = array();
@@ -402,28 +464,34 @@ class Controller_List extends Controller_Template
             for($i = 0; $i < 10; $i++){
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
-            DB::query(
-                "CREATE VIEW `vw_sequence99` AS
-                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
-                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-            )->execute();
+            DB::query
+                (
+                    "CREATE VIEW `vw_sequence99` AS
+                    SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                    FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+                )
+                ->execute();
         }
 
         // 年ごとの売上累計
-        $data['yearly'] = DB::query(
-            "SELECT DATE_FORMAT(date, '%Y') AS date, 
-            sum(number) AS sum_number, 
-            sum(order_children.price) AS sales,
-            COUNT(DISTINCT orders_id) as number_of_guest
-            FROM `order_children`
-            WHERE DATE_FORMAT(date, '%Y') BETWEEN '2015' AND '2030'
-            GROUP BY DATE_FORMAT(date, '%Y')
-            ORDER BY DATE_FORMAT(date, '%Y') ASC"
-        )->execute()->as_array();
+        $data['yearly'] = DB::select
+            (
+                DB::expr("DATE_FORMAT(date, '%Y') AS date"),
+                DB::expr("sum(number) AS sum_number"),
+                DB::expr("sum(order_children.price) AS sales"),
+                DB::expr("COUNT(DISTINCT orders_id) as number_of_guest")
+            )
+            ->from("order_children")
+            ->where(DB::expr("DATE_FORMAT(date, '%Y')"), "BETWEEN", DB::expr("'2015' AND '2030'"))
+            ->group_by(DB::expr("DATE_FORMAT(date, '%Y')"))
+            ->order_by(DB::expr("DATE_FORMAT(date, '%Y')"), "asc")
+            ->execute()->as_array();
 
         $data["subnav"] = array('earn'=> 'active' );
         $this->template->title = 'Sakana &raquo; 売り上げ';
         $this->template->content = View::forge('list/yearly_earn', $data);
         $this->template->nav = View::forge('template/nav', $data);
     }
+    
+    
 }

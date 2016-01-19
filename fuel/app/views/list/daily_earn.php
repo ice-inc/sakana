@@ -2,7 +2,7 @@
 <div class="btn-toolbar">
     <div class="btn-group">
         <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$before);?>'" type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>           
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
         </button>
         <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$next);?>'" type="button" class="btn btn-default">
             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
@@ -130,19 +130,22 @@
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo number_format(round($value['average2'], 1));?>
+                        <?php echo number_format($value['average2'], 1);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
+                        <?php echo number_format($value['current_total']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
+                        <?php echo number_format($value['last_total']);?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
+                        <?php echo number_format($value['year_on_year_total'], 1);?>%
                     </div>
                 </th>
             </tr>
