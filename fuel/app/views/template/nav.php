@@ -5,5 +5,6 @@
     <li class='<?php echo Arr::get($subnav, "ranking" ); ?>'><?php echo Html::anchor('list/ranking/'.$date.'/'.$date.'/'.$date,'予約ランキング');?></li>
     <li class='<?php echo Arr::get($subnav, "earn" ); ?>'><?php echo Html::anchor('list/daily_earn/'.$date,'売り上げ');?></li>
     <li class='<?php echo Arr::get($subnav, "order" ); ?>'><?php echo Html::anchor('order/create','予約');?></li>
+    <li class='<?php echo Arr::get($subnav, "email" ); ?>'><?php echo Html::anchor('email/email','予約確認メール送信');?></li>
     <li class='<?php echo Arr::get($subnav, "logout" ); ?>'><?php echo Html::anchor('user/logout','ログアウト');?></li>
 </ul>

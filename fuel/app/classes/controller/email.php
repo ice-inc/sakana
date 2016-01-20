@@ -1,11 +1,14 @@
 <?php
 
-class Controller_Email extends Controller
+class Controller_Email extends Controller_Template
 {
+    public $template = 'template/template';
+
     public function action_email()
     {
-        $now = Date::forge();
-        $date = Date::forge(strtotime(strftime('%Y%m%d', strtotime($now. '+1 days'))))->format('%Y/%m/%d');
+        $now = Date::forge()->get_timestamp();
+        $date = strtotime('+1 days', $now);
+        $data['tomorrow'] = Date::forge($date)->format('%Y/%m/%d');
 
         // POSTモデルから、全データを取得してビューに渡すための配列に入れる
         $data['client'] = Model_Client::find('all', array(
@@ -17,28 +20,42 @@ class Controller_Email extends Controller
                         ),
                     ),
                     'where' => array(
-                        array('date', '=', $date),
+                        array('date', '=', $data['tomorrow']),
                     ),
                 ),
             ),
         ));
+        
+        // 明日の予約分の合計を取得
+        $data['total'] = DB::select(
+            array('C.name', 'name'),
+            array(DB::expr('SUM(O.number)'), 'number'),
+            array(DB::expr('SUM(O.cost * O.number)'), 'cost'),
+            array(DB::expr('SUM(O.price * O.number)'), 'price')
+        )
+            ->from(array('order_children', 'O'))
+            ->join(array('commodities', 'C'), 'left')
+            ->on('O.commodity_id', '=', 'C.id')
+            ->where('date', '=', $data['tomorrow'])
+            ->group_by('commodity_id')
+            ->execute()->as_array();
 
-
+        $user_email = Auth::get('email');
+        $user_name = Auth::get('username');
         // 文字コード指定
         $email = Email::forge('jis');
         // 送信元アドレスと送信者名
-        $email->from('hiranakaken@server.world', 'mail.server.world');
+        $email->from($user_email, $user_name);
         // 送信先アドレス
-        $email->to('');
+        $email->to($user_email, $user_name);
         // 件名
         $email->subject('明日の予約一覧');
         // viewの内容が本文として書かれる
         $email->html_body(\View::forge('email/email', $data));
-        // 本文をエンコード
-        //$email->html_body(mb_convert_encoding($body, 'jis'));
 
         try
         {
+            // メール送信
             $email->send();
         }
         catch (\EmailValidationFailedException $e)
@@ -49,8 +66,13 @@ class Controller_Email extends Controller
         {
             $err_msg = '送信に失敗しました。';
         }
+        
+        $data['date'] = $now;
+        $data["subnav"] = array('email'=> 'active' );
+        \Response::redirect_back();
 
-        //$this->template->title = 'Sakana &raquo; 明日の予約';
-        //$this->template->content = View::forge('email/email', $data);
+        $this->template->title = 'Sakana &raquo; 明日の予約';
+        $this->template->content = View::forge('email/email', $data);
+        $this->template->nav = View::forge('template/nav', $data);
     }
 }

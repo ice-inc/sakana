@@ -1,6 +1,6 @@
 <?php
 
-class Model_User extends \Orm\Model_Soft
+class Model_User extends Orm\Model
 {
     protected static $_properties = array(
         'id',
@@ -24,11 +24,6 @@ class Model_User extends \Orm\Model_Soft
 			'events' => array('before_update'),
 			'mysql_timestamp' => false,
 		),
-	);
-
-	protected static $_soft_delete = array(
-				'deleted_at' => 'deletedAt',
-				'mysql_timestamp' => false,
 	);
 
 	protected static $_table_name = 'users';

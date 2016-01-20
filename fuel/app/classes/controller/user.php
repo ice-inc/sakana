@@ -25,7 +25,7 @@ class Controller_User extends Controller_Base
             }
             else
             {
-                Response::redirect('user');
+//                Response::redirect('user/login');
             }
         }
     }
@@ -90,6 +90,67 @@ class Controller_User extends Controller_Base
         $this->template->content = View::forge('user/login', array('val' => $val), false);
     }
 
+    public function action_create()
+    {
+        $val = Validation::forge();
+        // POSTされた場合
+        if (Input::method() == 'POST')
+        {
+            // 各項目をvalidateする
+            $val->add('username', 'Username')->add_rule('required');
+            $val->add('password', 'Password')->add_rule('required');
+            $val->add('email', 'Email')->add_rule('required');
+
+            // バリデーションがOKだった場合
+            if ($val->run())
+            {
+                try
+                {
+                    $created = Auth::create_user(
+                        Input::post('username'),
+                        Input::post('password'),
+                        Input::post('email'),
+                        1,
+                        array()
+                    );
+
+                    if($created)
+                    {
+                        // ユーザに通知
+                        Session::set_flash('Success', '新規登録完了しました');
+
+                        // そして、前のページに戻る
+                        \Response::redirect_back();
+                    }
+                    else
+                    {
+                        // 新しいユーザーの作成に失敗した場合
+                        Session::set_flash('Error', 'アカウント登録に失敗しました');
+                    }
+                }
+                
+                catch(\SimpleUserUpdateException $e)
+                {
+                    if($e->getCode() == 2)
+                    {
+                        Session::set_flash('Error', 'そのメールアドレスは、既に存在しています');
+                    }
+                    elseif($e->getCode() == 3)
+                    {
+                        Session::set_flash('Error', 'そのユーザ名は、既に存在しています');
+                    }
+                    else
+                    {
+                        Session::set_flash('Error', $e->getMessage());
+                    }
+                }                
+            }
+        }
+        
+        $this->template->title = 'Sakana &raquo; ユーザ登録';
+        $this->template->content = View::forge('user/create', array('val' => $val), false);
+    }
+    
     /**
      * ログアウト処理
      *

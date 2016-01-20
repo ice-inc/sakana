@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row pullcenter">
     <div class="col-md-3">
         <?php echo Form::open(array()); ?>
 
@@ -33,5 +33,7 @@
         </div>
 
         <?php echo Form::close(); ?>
+        <br>
+        <?php echo Html::anchor('user/create', '新規登録', array('class'=>'btn btn-default btn-block'));?>
     </div>
 </div>

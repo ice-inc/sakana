@@ -33,7 +33,7 @@
                         <th>商品名</th>
                         <th>価格</th>
                         <th>個数</th>
-                        <th>合計</th>
+                        <th>小計</th>
                     </tr>
                 </thead>
                 <tbody>
