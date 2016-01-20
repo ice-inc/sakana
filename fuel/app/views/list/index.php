@@ -55,10 +55,10 @@
                     <?php endforeach;?>
                 </tbody>
             </table>
-
-            <h4 style="margin:auto">合計<?php echo number_format($item->order->price);?>円</h4>
-            <?php echo Html::anchor('list/edit/'.$item->id,'編集', array('class'=>'btn btn-primary'));?>
-            <?php echo Html::anchor('list/complete/'.$item->id,'完了', array('class'=>'btn btn-success', 'onclick'=>"return confirm('完了しますか?')"));?>
+            <?php echo Html::anchor('list/edit/'.$item->id,'編集', array('class'=>'btn btn-primary pull-right', 'style'=>'margin-left:3px'));?>
+            <?php echo Html::anchor('list/complete/'.$item->id,'完了', array('class'=>'btn btn-success pull-right', 'onclick'=>"return confirm('完了しますか?')", 'style'=>'margin-left:3px'));?>
+            <h4 style="margin:auto" class="pull-right" style="margin:3px">合計<?php echo number_format($item->order->price);?>円</h4>
+            
         </div>
     </div>
 </div>

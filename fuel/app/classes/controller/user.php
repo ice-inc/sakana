@@ -66,7 +66,8 @@ class Controller_User extends Controller_Base
                                 // セッションフラッシュをセット
                                 Session::set_flash('ログインしました', e('ようこそ, '.$current_user->username.'さん'));
                                 // リダイレクト
-                                Response::redirect('list/index');
+                                $now = Date::forge()->get_timestamp();
+                                Response::redirect('list/index/'.$now);
                             }
                         }
                     }
