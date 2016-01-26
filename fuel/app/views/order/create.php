@@ -43,11 +43,12 @@
             </div>
         </div>
 
-    <table class="table table-striped">
+    <table class="table table-striped" id="table">
         <thead>
             <tr>
                 <th>商品名</th>
-                <th>価格</th>
+                <th>原価</th>
+                <th>定価</th>
                 <th>個数</th>
                 <th>小計</th>
                 <th>&nbsp;</th>
@@ -55,19 +56,30 @@
                 <th>&nbsp;</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tbody">
     <?php foreach ($commodity as $item): ?>
             <tr>
                 <td><?php echo $item->name; ?></td>
-                <td>￥<?php echo $item->cost; ?></td>
+                <td><?php echo number_format($item->cost); ?>円</td>
+                <td><?php echo number_format($item->price); ?>円</td>
                 <td>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-3">
                                 <?php echo Form::label('number', 'number', array('class'=>'sr-only'));?>
-                                <?php echo Form::input("order_child[$item->id][number]",
-                                                       Input::post('order_child.number', isset($order->order_child) ? $order->order_child->number:''),
-                                                       array('class'=>'col-md-8 form-control', 'rows'=>'8', 'placeholder'=>'個数','onChange'=>"price"));?>
+                                <?php
+                                echo Form::input("order_child[$item->id][number]",
+                                                   Input::post('order_child.number',
+                                                               isset($order->order_child) ? $order->order_child->number:''),
+                                                   array(
+                                                       'class'=>'col-md-8 form-control',
+                                                       'name'=>'number',
+                                                       'rows'=>'8',
+                                                       'placeholder'=>'個数',
+                                                       'onChange'=>'calculate()'
+                                                   )
+                                                  );
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -77,9 +89,19 @@
                         <div class="row">
                             <div class="col-xs-3">
                                 <?php echo Form::label('cost', 'cost', array('class'=>'sr-only'));?>
-                                <?php echo Form::input("order_child[$item->id][cost]",
-                                                       '0',
-                                                       array('class' => 'col-md-4 form-control', 'rows' => '8', 'placeholder'=>'小計', 'readonly'));?>
+                                <?php
+                                echo Form::input("cost",
+                                                '0',
+                                                   array(
+                                                       'class'=>'col-md-4 form-control',
+                                                       'id'=>'sub-total',
+                                                       'rows'=>'8',
+                                                       'placeholder'=>'小計',
+                                                       'readonly',
+                                                       'style'=>'width:100px'
+                                                   )
+                                                );
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -89,9 +111,15 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-3">
-                            <?php echo Form::input("order_child[$item->id][commodity_id]",
-                                                   Input::post('order_child.commodity_id', isset($order->order_child) ? $order->order_child->commodity_id:$item->id),
-                                                   array('class' => 'hidden'));?>
+                            <?php
+                            echo Form::input("order_child[$item->id][commodity_id]",
+                                                   Input::post('order_child.commodity_id',
+                                                               isset($order->order_child) ? $order->order_child->commodity_id:$item->id),
+                                                   array(
+                                                       'class' => 'hidden'
+                                                   )
+                                            );
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -101,9 +129,15 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-3">
-                                <?php echo Form::input("order_child[$item->id][cost]",
-                                                       Input::post('order_child.cost', isset($order->order_child) ? $order->order_child->cost:$item->cost),
-                                                       array('class' => 'hidden'));?>
+                                <?php
+                                echo Form::input("order_child[$item->id][cost]",
+                                                       Input::post('order_child.cost',
+                                                                   isset($order->order_child) ? $order->order_child->cost:$item->cost),
+                                                       array(
+                                                           'class' => 'hidden'
+                                                       )
+                                                );
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -131,7 +165,15 @@
             <?php echo Form::label('合計', 'price', array('class'=>'control-label'));?>
             <?php echo Form::input('price',
                                    '0',
-                                   array('class'=>'col-md-8 form-control', 'rows' => '8', 'placeholder'=>'合計', 'readonly'));?>
+                                   array(
+                                       'class'=>'col-md-8 form-control',
+                                       'id'=>'total',
+                                       'rows' => '8',
+                                       'placeholder'=>'合計',
+                                       'readonly'
+                                   )
+                                  );
+            ?>
         </div>
     </div>
 
@@ -140,7 +182,13 @@
             <?php echo Form::label('受取日', 'date', array('style'=>'control-label'));?>
             <?php echo Form::input('date',
                                    Input::post('date', isset($order->order_child->date) ? $order->order_child->date:''),
-                                   array('class' => 'col-md-8 form-control', 'rows' => '8', 'placeholder'=>'受取日'));?>
+                                   array(
+                                       'class' => 'col-md-8 form-control',
+                                       'rows' => '8',
+                                       'placeholder'=>'受取日'
+                                   )
+                                  );
+            ?>
         </div>
     </div>
 
@@ -165,7 +213,39 @@
         $('#form_date').datepicker({ dateFormat: 'yy/mm/dd' });
     });
 </script>
+<script type="text/javascript">
+    // 正規表現でセパレート
+    function separate(num){
+        return String(num).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+    }
 
+    // 小計、合計を求める
+    function calculate() {
+        var num = 0, num2 = 0;
+        var price, number, id = [];
+        var tBody = document.getElementById('tbody');
+        var subTotal = document.getElementsByName('cost');
+        var total = document.getElementById('total');
+        var rowLen = tBody.rows.length;
+
+        // 配列に値を追加
+        <?php foreach($commodity as $item):?>
+        <?php echo "id.push('form_order_child[$item->id][number]');";?>
+        <?php endforeach;?>
+
+        for(var i = 0; i < rowLen; i++){
+            var str = tBody.rows[i].cells[2].firstChild.data;
+            // 数に変換
+            price = parseInt(str);
+            number = document.getElementById(id[i]).value;
+            num = price * number;
+            subTotal[i].value = separate(num) + "円";
+            num2 = num2 + num;
+        }
+
+        total.value = separate(num2) + "円";
+    }
+</script>
 <?php else: ?>
 <h3>商品が登録されていません</h3>
 
