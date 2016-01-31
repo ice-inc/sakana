@@ -212,91 +212,9 @@ class Controller_List extends Controller_Template
         Response::redirect('list/index');
     }
 
-    public function action_ranking($day, $month, $year)
+    public function action_ranking()
     {
-        $data = array();
-
-        $formatted_day = date("Y/m/d", $day) . "\n";
-        $formatted_month = Date::forge($month)->format('%Y/%m');
-        $formatted_year = Date::forge($year)->format('%Y');
-
-        // 日時の計算
-        $data['next_day'] = strtotime('+1 days', $day);
-        $data['before_day'] = strtotime('-1 days', $day);
-        $data['next_month'] = strtotime('+1 month', $month);
-        $data['before_month'] = strtotime('-1 month', $month);
-        $data['next_year'] = strtotime('+1 year', $year);
-        $data['before_year'] = strtotime('-1 year', $year);
-
-        // 日別に一致したデータを集計
-        $data['result_daily'] = DB::select
-            (
-                "commodities.name",
-                DB::expr("sum(number) AS sum_number"), 
-                DB::expr("sum(order_children.price) AS sales")
-            )
-            ->from("order_children")
-            ->join("commodities", "inner")
-            ->on("commodity_id", "=", "commodities.id")
-            ->where("date", "=", $formatted_day)
-            ->group_by("commodity_id")
-            ->order_by("sum_number", "desc")
-            ->execute()->as_array();
-
-        // 月別にデータ集計
-        $data['result_monthly'] = DB::select
-            (
-                "commodities.name",
-                DB::expr("sum(number) AS sum_number"), 
-                DB::expr("sum(order_children.price) AS sales")
-            )
-            ->from("order_children")
-            ->join("commodities", "inner")
-            ->on("commodity_id", "=", "commodities.id")
-            ->where(DB::expr("DATE_FORMAT(date, '%Y/%m')"), $formatted_month)
-            ->group_by("commodity_id")
-            ->order_by("sum_number", "desc")
-            ->execute()->as_array();
-
-        // 年別にデータ集計
-        $data['result_yearly'] = DB::select
-            (
-                "commodities.name",
-                DB::expr("sum(number) AS sum_number"), 
-                DB::expr("sum(order_children.price) AS sales")
-            )
-            ->from("order_children")
-            ->join("commodities", "inner")
-            ->on("commodity_id", "=", "commodities.id")
-            ->where(DB::expr("DATE_FORMAT(date, '%Y')"), $formatted_year)
-            ->group_by("commodity_id")
-            ->order_by("sum_number", "desc")
-            ->execute()->as_array();
-
-        /*$data['result'] = DB::select(
-                'commodities.name',
-                DB::expr("SUM(CASE order_children.date WHEN $formatted_day THEN number ELSE 0 END ) as day_sum_number"),
-                DB::expr("SUM(CASE order_children.date WHEN $formatted_day THEN order_children.price ELSE 0 END ) as day_sales"),
-                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y/%m') WHEN $formatted_month THEN number ELSE 0 END ) as month_sum_number"),
-                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y/%m') WHEN $formatted_month THEN order_children.price ELSE 0 END ) as month_sales"),
-                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y') WHEN $formatted_year THEN number ELSE 0 END ) as year_sum_number"),
-                DB::expr("SUM(CASE DATE_FORMAT(date, '%Y') WHEN $formatted_year THEN order_children.price ELSE 0 END ) as year_sales")
-            )
-            ->from('order_children')
-            ->join('commodities', 'inner')
-            ->on('order_children.commodity_id', '=', 'commodities.id')
-            ->group_by('commodity_id')
-            ->order_by('sum_number', 'desc')
-            ->execute()->as_array();*/
-
         $data['date'] = Date::forge()->get_timestamp();
-        $data['day'] = $day;
-        $data['month'] = $month;
-        $data['year'] = $year;
-        $data['daily'] = Date::forge($day)->format('%Y年%m月%d日');
-        $data['monthly'] = Date::forge($month)->format('%Y年%m月');
-        $data['yearly'] = Date::forge($year)->format('%Y年');
-
         $data["subnav"] = array('ranking'=> 'active' );
         $this->template->title = 'Sakana &raquo; 予約ランキング';
         $this->template->content = View::forge('list/ranking', $data);

@@ -7,9 +7,11 @@
         <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$next);?>'" type="button" class="btn btn-default">
             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         </button>
-        <button id="calendar" type="button" class="btn btn-default" onclick="true">
+        <input id='datePick' class="hidden" onclick="showCalendar()">
+        <button id="calendar" type="button" class="btn btn-default hidden">
             <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
         </button>
+        </input>
     </div>
     <div class="btn-group">
         <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/'.$date);?>'" type="button" class="btn btn-default">月別へ</button>
@@ -153,3 +155,33 @@
         </tbody>
     </table>
 </div>
+<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/cupertino/jquery-ui.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var $ = jQuery.noConflict();
+        $.datepicker.setDefaults($.datepicker.regional['ja']);
+        $('#datePick').datepicker({
+            dateFormat: '@',
+            changeYear: false,
+            changeMonth: false,
+            showOn: 'button',
+            buttonImage: '',
+            onClose: getValue
+        });
+        
+        function getValue() {
+            // 値を取得。マイクロ秒単位
+            var date = $('#datePick').val();
+            // ミリ秒単位へ変換
+            var format = Math.round(date / 1000);
+
+            // ページ遷移
+            location.href = '<?php echo Uri::create('list/daily_earn/');?>' + format;
+        }
+    });
+    
+    
+</script>
