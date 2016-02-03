@@ -1,9 +1,7 @@
 <?php
 
-class Controller_Email extends Controller_Template
+class Controller_Email extends Controller
 {
-    public $template = 'template/template';
-
     public function action_email()
     {
         $now = Date::forge()->get_timestamp();
@@ -25,13 +23,13 @@ class Controller_Email extends Controller_Template
                 ),
             ),
         ));
-        
+
         // 明日の予約分の合計を取得
         $data['total'] = DB::select(
             array('C.name', 'name'),
             array(DB::expr('SUM(O.number)'), 'number'),
-            array(DB::expr('SUM(O.cost * O.number)'), 'cost'),
-            array(DB::expr('SUM(O.price * O.number)'), 'price')
+            array(DB::expr('SUM(O.cost)'), 'cost'),
+            array(DB::expr('SUM(O.price)'), 'price')
         )
             ->from(array('order_children', 'O'))
             ->join(array('commodities', 'C'), 'left')
@@ -66,13 +64,11 @@ class Controller_Email extends Controller_Template
         {
             $err_msg = '送信に失敗しました。';
         }
-        
+
         $data['date'] = $now;
         $data["subnav"] = array('email'=> 'active' );
         \Response::redirect_back();
 
-        $this->template->title = 'Sakana &raquo; 明日の予約';
-        $this->template->content = View::forge('email/email', $data);
-        $this->template->nav = View::forge('template/nav', $data);
+        return View::forge('email/email', $data);
     }
 }

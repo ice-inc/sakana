@@ -1,3 +1,5 @@
+<div class="col-xs-12 col-xs-offset-0">
+
 <h2>予約</h2>
 <br>
 
@@ -202,7 +204,7 @@
     <?php echo Form::close();?>
 
 </fieldset>
-
+</div>
 <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/cupertino/jquery-ui.min.css" />
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>

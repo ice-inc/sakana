@@ -1,4 +1,6 @@
 <br>
+<div class="col-xs-6 col-xs-offset-3">
+
 <?php if ($commodity): ?>
 <table class="table table-striped">
     <thead>
@@ -32,3 +34,4 @@
 <h3>商品が登録されていません</h3>
 
 <?php endif; ?><p>
+</div>

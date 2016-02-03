@@ -7,7 +7,7 @@
 </div>
 <br>
 <div class="row">
-    <div class="col-xs-4">
+    <div class="col-xs-6 col-xs-offset-3">
         <div class="table-responsive">
             <table class="table table-bordered table-condensed table-hover">
                 <thead>
@@ -29,6 +29,21 @@
                         <th>
                             <div class="center-block" style="width: 100%; text-align: center;">
                                 点数
+                            </div>
+                        </th>
+                        <th>
+                            <div class="center-block" style="width: 100%; text-align: center;">
+                                一点単価
+                            </div>
+                        </th>
+                        <th>
+                            <div class="center-block" style="width: 100%; text-align: center;">
+                                客単価
+                            </div>
+                        </th>
+                        <th>
+                            <div class="center-block" style="width: 100%; text-align: center;">
+                                セット率
                             </div>
                         </th>
                     </tr>
@@ -54,6 +69,21 @@
                         <th>
                             <div class="pull-right">
                                 <?php echo number_format($value['sum_number']);?>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="pull-right">
+                                <?php echo number_format($value['unit_price']);?>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="pull-right">
+                                <?php echo number_format($value['average']);?>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="pull-right">
+                                <?php echo number_format($value['set_ratio']);?>
                             </div>
                         </th>
                     </tr>

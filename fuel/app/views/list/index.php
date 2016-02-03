@@ -2,7 +2,7 @@
    <div class="center-block" style="width: 100%; text-align: center;">
     <h3><?php echo $formatted_date;?></h3>
 
-    <h1 style="font-size: 10em;">
+    <h1 style="font-size:5em;">
         <?php echo Html::anchor('list/index/'.$before,
                                 '',
                                 array('class'=>"btn btn-default glyphicon glyphicon-chevron-left", 'aria-hidden'=>"true"));?>
@@ -58,7 +58,7 @@
             <?php echo Html::anchor('list/edit/'.$item->id,'編集', array('class'=>'btn btn-primary pull-right', 'style'=>'margin-left:3px'));?>
             <?php echo Html::anchor('list/complete/'.$item->id,'完了', array('class'=>'btn btn-success pull-right', 'onclick'=>"return confirm('完了しますか?')", 'style'=>'margin-left:3px'));?>
             <h4 style="margin:auto" class="pull-right" style="margin:3px">合計<?php echo number_format($item->order->price);?>円</h4>
-            
+
         </div>
     </div>
 </div>
@@ -66,7 +66,7 @@
 
 <?php else: ?>
 <div class="center-block" style="width: 100%; text-align: center;">
-    <h1>予約がありません</h1>
+    <h1>予約はありません</h1>
 </div>
 
 <?php endif; ?>

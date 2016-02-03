@@ -1,4 +1,5 @@
 <br>
+<div class="col-xs-10 col-xs-offset-1">
 <div class="pull-left">
     <h2 style="margin:auto;">日別ランキング</h2>
     <br>
@@ -14,7 +15,7 @@
         </div>
 
         <div id="daily" class="panel-body">
-            
+
         </div>
     </div>
 </div>
@@ -35,7 +36,7 @@
         </div>
 
         <div id="monthly" class="panel-body">
-            
+
         </div>
     </div>
 </div>
@@ -55,11 +56,11 @@
         </div>
 
         <div id="yearly" class="panel-body">
-            
+
         </div>
     </div>
 </div>
-
+</div>
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script>
     $(function() {
@@ -77,7 +78,7 @@
                 $("#title_day").text(day.getFullYear() + "年" + date + "月" + day.getDate() + "日");
             }
         });
-        
+
         $.ajax({
             type: "GET",
             url: '<?php echo Uri::create("ranking/monthly/");?>' + Math.floor(month / 1000),
@@ -88,7 +89,7 @@
                 $("#title_month").text(month.getFullYear() + "年" + date + "月");
             }
         });
-        
+
         $.ajax({
             type: "GET",
             url: '<?php echo Uri::create("ranking/yearly/");?>' + Math.floor(year / 1000),
@@ -98,7 +99,7 @@
                 $("#title_year").text(year.getFullYear() + "年");
             }
         });
-        
+
         $('a.day').click(function(e) {
             day.setDate(day.getDate() + $(e.target).data("inc"));
             var next = Math.floor(day.getTime() / 1000);
@@ -114,7 +115,7 @@
                 }
             });
         });
-        
+
         $('a.month').click(function(e) {
             month.setMonth(month.getMonth() + $(e.target).data("inc"));
             var next = Math.floor(month.getTime() / 1000);
@@ -130,7 +131,7 @@
                 }
             });
         });
-        
+
         $('a.year').click(function(e) {
             year.setFullYear(year.getFullYear() + $(e.target).data("inc"));
             var next = Math.floor(year.getTime() / 1000);

@@ -260,18 +260,19 @@ class Controller_List extends Controller_Template
 
         // 今年と前年の月初めから月までの日付を持った売上テーブルを生成
         $data['daily'] = DB::select
-            (
-                DB::expr("ADDDATE('$first_date', V.Number) as date"),
-                DB::expr("IFNULL(Sum(DISTINCT O1.price), 0) as sales"),
-                DB::expr("ADDDATE('$first_date2', V.Number) as last_date"),
-                DB::expr("IFNULL(Sum(DISTINCT O2.price), 0) as last_sales"),
-                DB::expr("SUM(DISTINCT O1.price) / Sum(DISTINCT O2.price) * 100 as year_on_year"),
-                DB::expr("COUNT(DISTINCT O1.orders_id) as number_of_guest"),
-                DB::expr("COUNT(DISTINCT O2.orders_id) as number_of_guest2"),
-                DB::expr("IFNULL(Sum(DISTINCT O1.number), 0) as total_item"),
-                DB::expr("IFNULL(sum(DISTINCT O1.price)/COUNT(DISTINCT O1.orders_id),0) as average"),
-                DB::expr("IFNULL(Sum(DISTINCT O1.number)/COUNT(DISTINCT O1.orders_id),0) as average2")
-            )
+        (
+            DB::expr("ADDDATE('$first_date', V.Number) as date"),
+            DB::expr("IFNULL(Sum(DISTINCT O1.price), 0) as sales"),
+            DB::expr("ADDDATE('$first_date2', V.Number) as last_date"),
+            DB::expr("IFNULL(Sum(DISTINCT O2.price), 0) as last_sales"),
+            DB::expr("SUM(DISTINCT O1.price) / Sum(DISTINCT O2.price) * 100 as year_on_year"),
+            DB::expr("COUNT(DISTINCT O1.orders_id) as number_of_guest"),
+            DB::expr("COUNT(DISTINCT O2.orders_id) as number_of_guest2"),
+            DB::expr("IFNULL(Sum(DISTINCT O1.number), 0) as total_item"),
+            DB::expr("IFNULL(Sum(DISTINCT O1.price)/COUNT(DISTINCT O1.orders_id),0) as average"),
+            DB::expr("IFNULL(Sum(DISTINCT O1.number)/COUNT(DISTINCT O1.orders_id),0) as set_ratio"),
+            DB::expr("IFNULL(Sum(DISTINCT O1.price)/Sum(DISTINCT O1.number),0) as unit_price")
+        )
             ->from(array("vw_sequence99", "V"))
             ->join(array("order_children", "O1"), "left")
             ->on(DB::expr("ADDDATE('$first_date', V.Number)"), "=", DB::expr("DATE(O1.`date`)"))
@@ -333,22 +334,25 @@ class Controller_List extends Controller_Template
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
             DB::query
-                (
-                    "CREATE VIEW `vw_sequence99` AS
-                    SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
-                    FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-                )
+            (
+                "CREATE VIEW `vw_sequence99` AS
+                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+            )
                 ->execute();
         }
 
         // 月ごとの売上累計
         $data['monthly'] = DB::select
-            (
-                DB::expr("DATE_FORMAT(date, '%Y-%m') AS date"),
-                DB::expr("SUM(number) AS sum_number"),
-                DB::expr("SUM(order_children.price) AS sales"),
-                DB::expr("COUNT(DISTINCT orders_id) AS number_of_guest")
-            )
+        (
+            DB::expr("DATE_FORMAT(date, '%Y-%m') AS date"),
+            DB::expr("SUM(number) AS sum_number"),
+            DB::expr("SUM(order_children.price) AS sales"),
+            DB::expr("COUNT(DISTINCT orders_id) AS number_of_guest"),
+            DB::expr("IFNULL(SUM(order_children.price) / SUM(number), 0) AS unit_price"),
+            DB::expr("IFNULL(SUM(order_children.price) / COUNT(DISTINCT orders_id), 0) AS average_spending"),
+            DB::expr("IFNULL(SUM(number) / COUNT(DISTINCT orders_id), 0) AS set_ratio")
+        )
             ->from("order_children")
             ->where(DB::expr("DATE_FORMAT(date, '%Y-%m')"), "BETWEEN", DB::expr("'$year-01' AND '$year-12'"))
             ->group_by(DB::expr("DATE_FORMAT(date, '%Y-%m')"))
@@ -383,22 +387,25 @@ class Controller_List extends Controller_Template
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
             DB::query
-                (
-                    "CREATE VIEW `vw_sequence99` AS
-                    SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
-                    FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-                )
+            (
+                "CREATE VIEW `vw_sequence99` AS
+                SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
+                FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
+            )
                 ->execute();
         }
 
         // 年ごとの売上累計
         $data['yearly'] = DB::select
-            (
-                DB::expr("DATE_FORMAT(date, '%Y') AS date"),
-                DB::expr("sum(number) AS sum_number"),
-                DB::expr("sum(order_children.price) AS sales"),
-                DB::expr("COUNT(DISTINCT orders_id) as number_of_guest")
-            )
+        (
+            DB::expr("DATE_FORMAT(date, '%Y') AS date"),
+            DB::expr("sum(number) AS sum_number"),
+            DB::expr("sum(order_children.price) AS sales"),
+            DB::expr("COUNT(DISTINCT orders_id) AS number_of_guest"),
+            DB::expr("IFNULL(sum(order_children.price)/COUNT(DISTINCT orders_id),0) AS average"),
+            DB::expr("IFNULL(sum(order_children.price)/sum(number),0) AS unit_price"),
+            DB::expr("IFNULL(sum(number)/COUNT(DISTINCT orders_id),0) AS set_ratio")
+        )
             ->from("order_children")
             ->where(DB::expr("DATE_FORMAT(date, '%Y')"), "BETWEEN", DB::expr("'2015' AND '2030'"))
             ->group_by(DB::expr("DATE_FORMAT(date, '%Y')"))
@@ -410,6 +417,6 @@ class Controller_List extends Controller_Template
         $this->template->content = View::forge('list/yearly_earn', $data);
         $this->template->nav = View::forge('template/nav', $data);
     }
-    
-    
+
+
 }

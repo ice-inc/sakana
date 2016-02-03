@@ -7,16 +7,12 @@
         <button onclick="location.href='<?php echo Uri::create('list/daily_earn/'.$next);?>'" type="button" class="btn btn-default">
             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         </button>
-        <input id='datePick' class="hidden" onclick="showCalendar()">
-        <button id="calendar" type="button" class="btn btn-default hidden">
-            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-        </button>
-        </input>
-    </div>
-    <div class="btn-group">
-        <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/'.$date);?>'" type="button" class="btn btn-default">月別へ</button>
-        <button onclick="location.href='<?php echo Uri::create('list/yearly_earn/');?>'" type="button" class="btn btn-default">年別へ</button>
-    </div>
+        <input id='datePick' class="hidden"></input>
+</div>
+<div class="btn-group">
+    <button onclick="location.href='<?php echo Uri::create('list/monthly_earn/'.$date);?>'" type="button" class="btn btn-default">月別へ</button>
+    <button onclick="location.href='<?php echo Uri::create('list/yearly_earn/');?>'" type="button" class="btn btn-default">年別へ</button>
+</div>
 </div>
 <br>
 <div class="center-block" style="width: 100%; text-align: center;">
@@ -58,6 +54,11 @@
                 <th>
                     <div class="center-block" style="width: 100%; text-align: center;">
                         点数
+                    </div>
+                </th>
+                <th>
+                    <div class="center-block" style="width: 100%; text-align: center;">
+                        一点単価
                     </div>
                 </th>
                 <th>
@@ -127,12 +128,17 @@
                 </th>
                 <th>
                     <div class="pull-right">
+                        <?php echo number_format(round($value['unit_price'], 0));?>
+                    </div>
+                </th>
+                <th>
+                    <div class="pull-right">
                         <?php echo number_format(round($value['average'], 0));?>
                     </div>
                 </th>
                 <th>
                     <div class="pull-right">
-                        <?php echo number_format($value['average2'], 1);?>
+                        <?php echo number_format($value['set_ratio'], 0);?>
                     </div>
                 </th>
                 <th>
@@ -166,22 +172,28 @@
         $('#datePick').datepicker({
             dateFormat: '@',
             changeYear: false,
-            changeMonth: false,
+            changeMonth: true,
             showOn: 'button',
             buttonImage: '',
             onClose: getValue
         });
-        
+
+        var calendar_btn = $('button[class = "ui-datepicker-trigger"]');
+        calendar_btn.attr('class', 'ui-datepicker-trigger btn btn-default');
+        calendar_btn.html('<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>')
+
         function getValue() {
             // 値を取得。マイクロ秒単位
             var date = $('#datePick').val();
-            // ミリ秒単位へ変換
-            var format = Math.round(date / 1000);
-
-            // ページ遷移
-            location.href = '<?php echo Uri::create('list/daily_earn/');?>' + format;
+            var format;
+            if (date != 0) {
+                // ミリ秒単位へ変換
+                format = Math.round(date / 1000);
+                // ページ遷移
+                location.href = '<?php echo Uri::create('list/daily_earn/');?>' + format;
+            }
         }
     });
-    
-    
+
+
 </script>
