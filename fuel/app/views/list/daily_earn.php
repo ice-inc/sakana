@@ -159,12 +159,27 @@
             </tr>
             <?php endforeach;?>
         </tbody>
+        <tfoot>
+            <tr>
+                <th><strong class="pull-right">合計</strong></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
     </table>
 </div>
-<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/cupertino/jquery-ui.min.css" />
-<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>
+
+
 <script type="text/javascript">
     $(function() {
         var $ = jQuery.noConflict();
@@ -194,6 +209,4 @@
             }
         }
     });
-
-
 </script>

@@ -19,8 +19,15 @@ class Controller_List extends Controller_Template
     {
         $data = array();
 
-        // タイムスタンプをフォーマット
-        $now = Date::forge($date)->format('%Y/%m/%d');
+        if (!$date) {
+            // $dateがnullの時, 代入
+            $date = \Fuel\Core\Date::forge()->get_timestamp();
+            // タイムスタンプをフォーマット
+            $now = Date::forge($date)->format('%Y/%m/%d');
+        } else {
+            // タイムスタンプをフォーマット
+            $now = Date::forge($date)->format('%Y/%m/%d');
+        }
 
         // 表示されている日付の前後の日付を計算
         $data['next'] = strtotime('+1 days', $date);
@@ -196,7 +203,7 @@ class Controller_List extends Controller_Template
             ),
         )))
         {
-            // 該当記事を削除する
+            // 削除
             $post->delete();
             // 削除に成功したメッセージをセット
             Session::set_flash('完了しました');
@@ -238,23 +245,19 @@ class Controller_List extends Controller_Template
         $first_date2 = date('Y-m-d', strtotime("$first_date -1 year"));
         $last_date2 = date('Y-m-d', strtotime("$last_date -1 year"));
 
-        // テーブルを選択
-        $query = DB::query("SELECT * FROM mst_digit");
-        $data['query'] = $query->execute();
-
         // nullの場合、データをセットしビューを生成
-        if($query->execute() == null)
+        if(!DB::query("SELECT * FROM vw_sequence99"))
         {
             for($i = 0; $i < 10; $i++)
             {
                 DB::query("INSERT INTO mst_digit (digit) VALUES ('$i')")->execute();
             }
             DB::query
-                (
-                    "CREATE VIEW `vw_sequence99` AS
+            (
+                "CREATE VIEW `vw_sequence99` AS
                     SELECT (`d1`.`digit` + (`d2`.`digit` * 10)) AS `Number`
                     FROM (`mst_digit` `d1` join `mst_digit` `d2`);"
-                )
+            )
                 ->execute();
         }
 

@@ -153,9 +153,7 @@
 
 </fieldset>
 
-<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
-<?php echo Asset::js(array('jquery-1.11.3.min.js', 'jquery-ui.min.js')); ?>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>
+
 <script type="text/javascript">
     $(function() {
         $.datepicker.setDefaults($.datepicker.regional['ja']);

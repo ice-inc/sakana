@@ -62,7 +62,7 @@ class Controller_Order extends Controller_Template
                         'email' => Input::post('email'),
                     ));
 
-                    $order = Model_Order::forge();
+//                    $order = Model_Order::forge();
 
                     // 各POSTデータをモデルオブジェクトとして、$orderに代入
                     $client->order = Model_Order::forge(array(

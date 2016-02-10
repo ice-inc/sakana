@@ -13,6 +13,6 @@ class Create_mst_digit
 
     public function down()
     {
-        \DBUtil::drop_table('users');
+        \DBUtil::drop_table('mst_digit');
     }
 }

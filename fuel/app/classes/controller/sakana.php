@@ -17,10 +17,13 @@ class Controller_Sakana extends Controller_Template
 
     public function action_index()
     {
-        //$data['date'] = Date::time()->format('%Y%m%d');
         $data['date'] = Date::forge()->get_timestamp();
-        // POSTモデルから、全データを取得してビューに渡すための配列に入れる
-        $data['commodity'] = Model_Commodity::find('all');
+
+        // モデルから、全データを取得してビューに渡すための配列に入れる
+        $data['commodity'] = Model_Commodity::find('all',array(
+           'related' => array('stock')
+        ));
+
         // ビューテンプレート
         $data["subnav"] = array('index'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品一覧';
@@ -31,50 +34,58 @@ class Controller_Sakana extends Controller_Template
     public function action_create()
     {
         $data = array();
-        //$data['date'] = Date::time()->format('%Y%m%d');
         $data['date'] = Date::forge()->get_timestamp();
-
-        $data['name'] = null;
-        $data['cost'] = null;
-        $data['price'] = null;
 
         // 投稿ボタンが押され、postされたとき
         if (Input::method() == 'POST')
         {
+            $post = \Fuel\Core\Input::post();
             // model/post.phpで定義されたvalidateメソッド実行
             // validateオブジェクトを$valに代入
-            $val = Model_Commodity::validate('create');
+            $val1 = Model_Commodity::validate('create1');
 
-            if ($val->run())
+            if ($val1->run())
             {
-                // 各POSTデータをモデルオブジェクトとして、$postに代入
-                $post = Model_Commodity::forge(array(
-                    'name' => Input::post('name'),
-                    'cost' => Input::post('cost'),
-                    'price' => Input::post('price'),
-                ));
+                $val2 = Model_Stock::validate('create2');
+
+                print_r($post['number']);
+                if ($val2->run())
+                {
+                    // 各POSTデータをモデルオブジェクトとして、$postに代入
+                    $commodity = Model_Commodity::forge(array(
+                        'name' => $post['name'],
+                        'cost' => $post['cost'],
+                        'price' => $post['price'],
+                    ));
+
+                    $commodity->stock = Model_Stock::forge(array(
+                        'number' => $post['number']
+                    ));
 
                     // 各POSTデータの保存に成功した時
-                if ($post and $post->save())
-                {
-                    // 成功したメッセージをフラッシュセッションに入れる
-                    Session::set_flash('データの登録に成功しました');
-                    // TOPページへリダイレクト
-                    Response::redirect('sakana/index');
+                    if ($commodity and $commodity->save()) {
+                        // 成功したメッセージをフラッシュセッションに入れる
+                        Session::set_flash('データの登録に成功しました');
+                        // TOPページへリダイレクト
+                        Response::redirect('sakana/index');
+                    } // 各POSTデータの保存失敗時
+                    else {
+                        // エラーメッセージをフラッシュセッションに入れる
+                        Session::set_flash('エラー', 'データの保存に失敗しました');
+                    }
                 }
-
-                // 各POSTデータの保存失敗時
+                // validationエラーが出たとき
                 else
                 {
-                // エラーメッセージをフラッシュセッションに入れる
-                Session::set_flash('エラー', 'データの保存に失敗しました');
+                    // validationエラーのメッセージをセットする
+                    Session::set_flash('error', $val2->error());
                 }
             }
             // validationエラーが出たとき
             else
             {
                 // validationエラーのメッセージをセットする
-                Session::set_flash('error', $val->error());
+                Session::set_flash('error', $val1->error());
             }
         }
 
@@ -89,14 +100,13 @@ class Controller_Sakana extends Controller_Template
     public function action_edit($id=null)
     {
         $data = array();
-        //$data['date'] = Date::time()->format('%Y%m%d');
         $data['date'] = Date::forge()->get_timestamp();
 
         // URLに記事idが含まれていない時、トップページへ戻す
         is_null($id) and Response::redirect('sakana/index');
 
         // 記事idのデータがモデルから見つけられない時
-        if ( ! $post = Model_Commodity::find($id))
+        if ( ! $post = Model_Commodity::find($id,array('related' => 'stock')))
         {
             // エラーメッセージをセット
             Session::set_flash('エラー', '商品が見つかりません');
@@ -105,38 +115,65 @@ class Controller_Sakana extends Controller_Template
         }
 
         // 保存されているデータの呼び出し
-        $data['name'] = $post->name;
-        $data['cost'] = $post->cost;
-        $data['price'] = $post->price;
+        $data['name'] = $post['name'];
+        $data['cost'] = $post['cost'];
+        $data['price'] = $post['price'];
+        $data['number'] = $post['stock']['number'];
 
         // model/post.phpで定義された、validatieメソッド実行
         // validationオブジェクトを$valに代入
-        $val = Model_Commodity::validate('edit');
+        $val1 = Model_Commodity::validate('edit1');
 
         // validationチェックしてOKだった場合
-        if ($val->run())
+        if ($val1->run())
         {
-            // 入力データを$postに格納する
-            $post->name = Input::post('name');
-            $post->cost = Input::post('cost');
-            $post->price = Input::post('price');
+            $val2 = Model_Stock::validate('edit2');
 
-            // $postの保存成功
-            if ($post->save())
-            {
-                //成功メッセージをセット
-                Session::set_flash('変更しました');
+            if ($val2->run()) {
+                try
+                {
+                    // 入力データを$postに格納する
+                    $post['name'] = Input::post('name');
+                    $post['cost'] = Input::post('cost');
+                    $post['price'] = Input::post('price');
+                    $post->stock->number = Input::post('number');
 
-                // トップページへ戻る
-                Response::redirect('sakana/index');
+                    // $postの保存成功
+                    if ($post->save())
+                    {
+                        //成功メッセージをセット
+                        Session::set_flash('変更しました');
+
+                        // トップページへ戻る
+                        Response::redirect('sakana/index');
+                    } // $postの保存失敗
+                    else Session::set_flash('エラー', '変更に失敗しました'); // エラーメッセージをセット
+
+                }
+                catch (PhpErrorException $e)
+                {
+                    $commodity = Model_Commodity::find('all');
+                    $commodity->name = Input::post('name');
+                    $commodity->cost = Input::post('cost');
+                    $commodity->price = Input::post('price');
+                    $stock = Model_Stock::forge(array(
+                        'number' => $post['number'],
+                        'commodity_id' => $post['id']
+                    ));
+
+                    if ($commodity->save() && $stock->save())
+                    {
+                        //成功メッセージをセット
+                        Session::set_flash('変更しました');
+
+                        // トップページへ戻る
+                        Response::redirect('sakana/index');
+
+                    }
+                    else Session::set_flash('エラー', '変更に失敗しました'); // エラーメッセージをセット
+                }
             }
-
-            // $postの保存失敗
-            else
-            {
-                // エラーメッセージをセット
-                Session::set_flash('エラー', '変更に失敗しました');
-            }
+            else Session::set_flash('error', $val2->error()); // validエラーのメッセージをセットする
         }
 
         // validationでエラーが出たとき
@@ -147,16 +184,13 @@ class Controller_Sakana extends Controller_Template
             {
                 // validationチェックしてOKのフィールドは,$postへ保存する
                 // validエラーのものは保存されない
-                $post->name = $val->validated('name');
-                $post->cost = $val->validated('cost');
-                $post->price = $val->validated('price');
+                $post->name = $val1->validated('name');
+                $post->cost = $val1->validated('cost');
+                $post->price = $val1->validated('price');
 
                 // validエラーのメッセージをセットする
-                Session::set_flash('error', $val->error());
+                Session::set_flash('error', $val1->error());
             }
-
-            // 複数のビューに$postを渡せるようにset_globalで、ビューを呼び出す
-            $this->template->set_global('sakana', $post, false);
         }
 
         $data["subnav"] = array('reservation'=> 'active' );
@@ -171,6 +205,7 @@ class Controller_Sakana extends Controller_Template
     {
         // URLに記事idが含まれていない時、トップページへ
         is_null($id) and Response::redirect('sakana/index');
+
         // 記事idが見つかった時
         if ($post = Model_Commodity::find($id))
         {
