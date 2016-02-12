@@ -2,13 +2,24 @@
 
 class Controller_Order extends Controller_Template
 {
+    public $template = 'template/template';
+
+    public function before()
+    {
+        // この行がないと、テンプレートが動作しない!
+        parent::before();
+
+        //未ログインの場合、ログインページへリダイレクト
+        if(!Auth::check()){
+            Response::redirect('user/login');
+        }
+    }
 
     public function action_create()
     {
         $data = array();
-        //$data['date'] = Date::time()->format('%Y%m%d');
         $data['date'] = Date::forge()->get_timestamp();
-        
+
         // Commodityモデルから、全データを取得してビューに渡すための配列に入れる
         $data['commodity'] = Model_Commodity::find('all');
 
@@ -31,10 +42,10 @@ class Controller_Order extends Controller_Template
                     $sum_num = 0;
                     $sum_cost = 0;
                     $sum_price = 0;
-                 
+
                     // POSTされたデータを$order_childに代入
                     $order_child = Input::post('order_child');
-                    
+
                     // それぞれの合計値を求める
                     foreach ($order_child as $key => $value)
                     {
@@ -50,9 +61,9 @@ class Controller_Order extends Controller_Template
                         'tell' => Input::post('tell'),
                         'email' => Input::post('email'),
                     ));
-                    
-                    $order = Model_Order::forge();
-                    
+
+//                    $order = Model_Order::forge();
+
                     // 各POSTデータをモデルオブジェクトとして、$orderに代入
                     $client->order = Model_Order::forge(array(
                         'number' => $sum_num,
@@ -111,6 +122,7 @@ class Controller_Order extends Controller_Template
         $data["subnav"] = array('order'=> 'active' );
         $this->template->title = 'Sakana &raquo; 商品予約';
         $this->template->content = View::forge('order/create', $data);
+        $this->template->nav = View::forge('template/nav', $data);
     }
 
 }

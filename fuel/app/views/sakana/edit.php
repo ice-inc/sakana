@@ -1,2 +1,2 @@
 
-<?php echo render('sakana/_form'); ?>
+<?php echo render('sakana/_form');

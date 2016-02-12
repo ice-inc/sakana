@@ -24,13 +24,13 @@
 return array(
 
     /**
-	 * Default setup group
-	 */
+     * Default setup group
+     */
     'default_setup' => 'default',
 
     /**
-	 * Default setup groups
-	 */
+     * Default setup groups
+     */
     'setups' => array(
         'default' => array(),
         'jis' => array(
@@ -40,122 +40,122 @@ return array(
     ),
 
     /**
-	 * Default settings
-	 */
+     * Default settings
+     */
     'defaults' => array(
 
         /**
-		 * Mail useragent string
-		 */
+         * Mail useragent string
+         */
         'useragent' => 'FuelPHP, PHP 5.3 Framework',
 
         /**
-		 * Mail driver (mail, smtp, sendmail, noop)
-		 */
-        'driver' => 'mail',
+         * Mail driver (mail, smtp, sendmail, noop)
+         */
+        'driver' => 'smtp',
 
         /**
-		 * Whether to send as html, set to null for autodetection.
-		 */
+         * Whether to send as html, set to null for autodetection.
+         */
         'is_html' => null,
 
         /**
-		 * Email charset
-		 */
+         * Email charset
+         */
         'charset' => 'utf-8',
 
         /**
-		 * Whether to encode subject and recipient names.
-		 * Requires the mbstring extension: http://www.php.net/manual/en/ref.mbstring.php
-		 */
+         * Whether to encode subject and recipient names.
+         * Requires the mbstring extension: http://www.php.net/manual/en/ref.mbstring.php
+         */
         'encode_headers' => true,
 
         /**
-		 * Ecoding (8bit, base64 or quoted-printable)
-		 */
+         * Ecoding (8bit, base64 or quoted-printable)
+         */
         'encoding' => '8bit',
 
         /**
-		 * Email priority
-		 */
+         * Email priority
+         */
         'priority' => \Email::P_NORMAL,
 
         /**
-		 * Default sender details
-		 */
+         * Default sender details
+         */
         'from' => array(
             'email' => false,
-            'name'  => false,
+            'name'  => 'Sakana',
         ),
 
         /**
-		 * Whether to validate email addresses
-		 */
+         * Whether to validate email addresses
+         */
         'validate' => true,
 
         /**
-		 * Auto attach inline files
-		 */
+         * Auto attach inline files
+         */
         'auto_attach' => true,
 
         /**
-		 * Auto generate alt body from html body
-		 */
+         * Auto generate alt body from html body
+         */
         'generate_alt' => true,
 
         /**
-		 * Forces content type multipart/related to be set as multipart/mixed.
-		 */
+         * Forces content type multipart/related to be set as multipart/mixed.
+         */
         'force_mixed' => false,
 
         /**
-		 * Wordwrap size, set to null, 0 or false to disable wordwrapping
-		 */
+         * Wordwrap size, set to null, 0 or false to disable wordwrapping
+         */
         'wordwrap' => 76,
 
         /**
-		 * Path to sendmail
-		 */
+         * Path to sendmail
+         */
         'sendmail_path' => '/usr/sbin/sendmail',
 
         /**
-		 * SMTP settings
-		 */
+         * SMTP settings
+         */
         'smtp' => array(
-            'host'     => '',
-            'port'     => 25,
-            'username' => '',
-            'password' => '',
+            'host'     => 'ssl://smtp.gmail.com',
+            'port'     => 465,
+            'username' => 'rika8200@gmail.com',
+            'password' => 'rika-8200',
             'timeout'  => 5,
             'starttls' => false,
         ),
 
         /**
-		 * Newline
-		 */
-        'newline' => "\n",
+         * Newline
+         */
+        'newline' => "\r\n",
 
         /**
-		 * Attachment paths
-		 */
+         * Attachment paths
+         */
         'attach_paths' => array(
-            '', 		// absolute path
-            DOCROOT, 	// relative to docroot.
+            '',         // absolute path
+            DOCROOT,     // relative to docroot.
         ),
 
         /**
-		 * Default return path
-		 */
+         * Default return path
+         */
         'return_path' => false,
 
         /**
-		 * Remove html comments
-		 */
+         * Remove html comments
+         */
         'remove_html_comments' => true,
 
         /**
-		 * Mandrill settings, see http://mandrill.com/
-		 */
+         * Mandrill settings, see http://mandrill.com/
+         */
         'mandrill' => array(
             'key' => 'api_key',
             'message_options' => array(),
@@ -167,19 +167,19 @@ return array(
         ),
 
         /**
-		 * Mailgun settings, see http://www.mailgun.com/
-		 */
+         * Mailgun settings, see http://www.mailgun.com/
+         */
         'mailgun' => array(
             'key'    => 'api_key',
             'domain' => 'domain',
         ),
 
         /**
-		 * When relative protocol uri's ("//uri") are used in the email body,
-		 * you can specify here what you want them to be replaced with. Options
-		 * are "http://", "https://" or \Input::protocol() if you want to use
-		 * whatever was used to request the controller.
-		 */
+         * When relative protocol uri's ("//uri") are used in the email body,
+         * you can specify here what you want them to be replaced with. Options
+         * are "http://", "https://" or \Input::protocol() if you want to use
+         * whatever was used to request the controller.
+         */
         'relative_protocol_replacement' => false,
     ),
 );

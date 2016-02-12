@@ -76,4 +76,16 @@ class Validation_Japanese
 
         return false;
     }
+
+    public static function _validation_zenkatakana($val)
+    {
+        if( empty($val) ){ return true; }
+
+        mb_regex_encoding("UTF-8");
+        if (preg_match("/^[ァ-ヶー]+$/u", $val)) {
+            return true;
+        }
+
+        return false;
+    }
 }

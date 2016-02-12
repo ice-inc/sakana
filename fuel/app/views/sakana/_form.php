@@ -1,47 +1,40 @@
-<ul class="nav nav-pills">
-    <li class='<?php echo Arr::get($subnav, "index" ); ?>'><?php echo Html::anchor('sakana/index','商品一覧');?></li>
-    <li class='<?php echo Arr::get($subnav, "create" ); ?>'><?php echo Html::anchor('sakana/create','商品登録');?></li>
-    <li class='<?php echo Arr::get($subnav, "list" ); ?>'><?php echo Html::anchor('list/index/'.$date,'予約一覧');?></li>
-    <li class='<?php echo Arr::get($subnav, "ranking" ); ?>'><?php echo Html::anchor('list/ranking','予約ランキング');?></li>
-    <li class='<?php echo Arr::get($subnav, "earn" ); ?>'><?php echo Html::anchor('list/earn','売り上げ');?></li>
-    <li class='<?php echo Arr::get($subnav, "order" ); ?>'><?php echo Html::anchor('order/create','予約');?></li>
-    <li class='<?php echo Arr::get($subnav, "logout" ); ?>'><?php echo Html::anchor('user/logout','ログアウト');?></li>
-</ul>
+<div class="col-md-3 col-md-offset-4">
+
     <?php echo Form::open(array("class"=>"form-horizontal")); ?>
 
-    <fieldset>
         <div class="row">
             <div class="form-group">
-                <div class="col-xs-3">
                     <?php echo Form::label('商品名', 'name', array('class'=>'control-label')); ?>
                     <?php echo Form::input('name',
-                        Input::post('name', isset($post) ? $post->name : $name),
+                        Input::post('name', isset($name) ? $name : ''),
                         array('class' => 'col-md-4 form-control', 'istyle'=>'1', 'placeholder'=>'商品名'));
                     ?>
-                </div>
             </div>
             <div class="form-group">
-                <div class="col-xs-2">
                     <?php echo Form::label('原価', 'cost', array('class'=>'control-label')); ?>
                     <?php echo Form::input('cost',
-                      Input::post('cost', isset($post) ? $post->cost : $cost),
+                      Input::post('cost', isset($cost) ? $cost : ''),
                       array('class' => 'col-md-8 form-control', 'rows' => 8, 'istyle'=>'4', 'placeholder'=>'原価'));
                     ?>
-                </div>
             </div>
             <div class="form-group">
-                <div class="col-xs-2">
                     <?php echo Form::label('定価', 'price', array('class'=>'control-label')); ?>
                     <?php echo Form::input('price',
-                      Input::post('price', isset($post) ? $post->price : $price),
+                      Input::post('price', isset($price) ? $price : ''),
                       array('class' => 'col-md-4 form-control', 'istyle'=>'4', 'placeholder'=>'定価'));
                     ?>
-                </div>
+            </div>
+            <div class="form-group">
+                <?php echo Form::label('在庫数', 'number', array('class'=>'control-label')); ?>
+                <?php echo Form::input('number',
+                    Input::post('number', isset($number) ? $number : ''),
+                    array('class' => 'col-md-4 form-control', 'istyle'=>'4', 'placeholder'=>'在庫数'));
+                ?>
             </div>
             <div class="form-group">
                 <label class='control-label'>&nbsp;</label>
                 <?php echo Form::submit('submit', '登録', array('class' => 'btn btn-primary')); ?>
             </div>
         </div>
-    </fieldset>
     <?php echo Form::close(); ?>
+</div>
