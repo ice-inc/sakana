@@ -57,14 +57,13 @@ class Model_Order_Child extends \Orm\Model_Soft
     {
         $val = Validation::forge($factory);
 
-        if (Input::post('order_child'))
+        if (Input::post('order'))
         {
-            $order_children = Input::post('order_child');
+            $order_children = Input::post('order');
 
             foreach ($order_children as $form_id => $order_child)
             {
-                $val->add_field('order_child.' . $form_id . '.number', '個数', 'required|valid_string[numeric]|max_length[4]');
-                //$val->add_field('date', '受取日', 'required|max_length[15]');
+                $val->add_field('order.' . $form_id . '.number', '個数', 'required|valid_string[numeric]|max_length[4]');
             }
             return $val;
         }
