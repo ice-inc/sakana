@@ -9,7 +9,6 @@
     <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/cupertino/jquery-ui.min.css" />
 </head>
 <body>
-<?php echo $nav;?>
 <div class="container" style="margin: 60px">
     <div class="col-md-12">
         <h1><?php echo $title; ?></h1>

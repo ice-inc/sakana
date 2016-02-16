@@ -21,7 +21,9 @@ class Controller_Order extends Controller_Template
         $data['date'] = Date::forge()->get_timestamp();
 
         // Commodityモデルから、全データを取得してビューに渡すための配列に入れる
-        $data['commodity'] = Model_Commodity::find('all');
+        $data['commodity'] = Model_Commodity::find('all', array(
+            'related' => array('stock')
+        ));
 
         if (Input::method() == 'POST')
         {
@@ -37,22 +39,10 @@ class Controller_Order extends Controller_Template
                 $order_child_val = Model_Order_Child::validate('create2');
 
                 // validationがOKだった場合
-                if ($order_child_val->run($post['order_child']))
+                if ($order_child_val->run())
                 {
-                    $sum_num = 0;
-                    $sum_cost = 0;
-                    $sum_price = 0;
-
                     // POSTされたデータを$order_childに代入
-                    $order_child = Input::post('order_child');
-
-                    // それぞれの合計値を求める
-                    foreach ($order_child as $key => $value)
-                    {
-                        $sum_cost += Input::post("order_child.$key.number") * Input::post("order_child.$key.cost");
-                        $sum_num += Input::post("order_child.$key.number");
-                        $sum_price += Input::post("order_child.$key.number") * Input::post("order_child.$key.price");
-                    }
+                    $order_child = Input::post('order');
 
                     // 各POSTデータをモデルオブジェクトとして、$clientに代入
                     $client = Model_Client::forge(array(
@@ -62,12 +52,10 @@ class Controller_Order extends Controller_Template
                         'email' => Input::post('email'),
                     ));
 
-//                    $order = Model_Order::forge();
-
                     // 各POSTデータをモデルオブジェクトとして、$orderに代入
                     $client->order = Model_Order::forge(array(
-                        'number' => $sum_num,
-                        'price' => $sum_price,
+                        'number' => Input::post('ttl_num'),
+                        'price' => Input::post('ttl_prc'),
                         'date' => Input::post('date'),
                     ));
 
@@ -76,10 +64,10 @@ class Controller_Order extends Controller_Template
                     {
                         // 各POSTデータをモデルオブジェクトとして、$order_childに代入
                         $client->order->order_child[] = Model_Order_Child::forge(array(
-                            'commodity_id' => Input::post("order_child.$key.commodity_id"),
-                            'cost' => Input::post("order_child.$key.number") * Input::post("order_child.$key.cost"),
-                            'number' => Input::post("order_child.$key.number"),
-                            'price' => Input::post("order_child.$key.number") * Input::post("order_child.$key.price"),
+                            'commodity_id' => Input::post("order.$key.id"),
+                            'number' => Input::post("order.$key.number"),
+                            'cost' => Input::post("order.$key.total_cost"),
+                            'price' => Input::post("order.$key.total_price"),
                             'date' => Input::post('date'),
                         ));
                     }
